@@ -1,0 +1,11 @@
+# Secrets — never commit these
+extension/lib/config.js
+
+# macOS
+.DS_Store
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcuserdata/
