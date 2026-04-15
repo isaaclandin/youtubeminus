@@ -1,0 +1,110 @@
+name: YouTubeMinus
+
+options:
+  deploymentTarget:
+    macOS: "13.0"
+  bundleIdPrefix: com.youtubeminus
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
+
+# ── Shared settings ───────────────────────────────────────────────────────────
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: YES
+  configs:
+    # Debug — ad-hoc signing so the project builds immediately without
+    # a certificate.  Binary replacement is NOT detected in debug builds.
+    Debug:
+      CODE_SIGN_IDENTITY: "-"
+    # Release — requires the "YouTubeMinus Developer" self-signed certificate
+    # (see README.md § Signing → Option A).  This is what you use for
+    # deployment; the daemon's signature check in TamperWatcher only
+    # provides real protection when the binary is properly signed here.
+    Release:
+      CODE_SIGN_IDENTITY: "YouTubeMinus Developer"
+
+# ── Targets ───────────────────────────────────────────────────────────────────
+targets:
+
+  # ── Main app (menu bar) ────────────────────────────────────────────────────
+  YouTubeMinus:
+    type: application
+    platform: macOS
+
+    info:
+      path: YouTubeMinus/Info.plist
+      properties:
+        LSUIElement: true
+        NSPrincipalClass: NSApplication
+        NSHighResolutionCapable: true
+        NSSupportsSuddenTermination: false
+
+    entitlements:
+      path: YouTubeMinus/YouTubeMinus.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+        com.apple.security.network.client: true
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.youtubeminus.app
+        INFOPLIST_FILE: YouTubeMinus/Info.plist
+        CODE_SIGN_ENTITLEMENTS: YouTubeMinus/YouTubeMinus.entitlements
+
+    sources:
+      - path: YouTubeMinus
+        excludes:
+          - Info.plist
+          - "*.entitlements"
+      - path: Shared
+
+    # Copy the helper binary into the app bundle so HelperInstaller can find it.
+    # Xcode will build YouTubeMinusHelper first due to the dependency.
+    dependencies:
+      - target: YouTubeMinusHelper
+        embed: false       # we copy manually via the script phase below
+
+    # Copy helper binary + launchd plist into Contents/MacOS and
+    # Contents/LaunchDaemons respectively so HelperInstaller.swift can find them.
+    postBuildScripts:
+      - name: Copy helper into bundle
+        script: |
+          DEST_BIN="$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/MacOS/YouTubeMinusHelper"
+          DEST_PLIST="$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/LaunchDaemons/com.youtubeminus.helper.plist"
+          mkdir -p "$(dirname $DEST_PLIST)"
+          cp -f "$BUILT_PRODUCTS_DIR/YouTubeMinusHelper" "$DEST_BIN"
+          cp -f "$SRCROOT/LaunchDaemon/com.youtubeminus.helper.plist" "$DEST_PLIST"
+        basedOnDependencyAnalysis: false
+
+  # ── Privileged helper (CLI tool / launch daemon) ───────────────────────────
+  YouTubeMinusHelper:
+    type: tool
+    platform: macOS
+
+    info:
+      path: YouTubeMinusHelper/Info.plist
+
+    entitlements:
+      path: YouTubeMinusHelper/YouTubeMinusHelper.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+        com.apple.security.network.client: true
+        com.apple.security.network.server: true
+
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.youtubeminus.helper
+        INFOPLIST_FILE: YouTubeMinusHelper/Info.plist
+        CODE_SIGN_ENTITLEMENTS: YouTubeMinusHelper/YouTubeMinusHelper.entitlements
+        SKIP_INSTALL: YES
+
+    sources:
+      - path: YouTubeMinusHelper
+        excludes:
+          - Info.plist
+          - "*.entitlements"
+      - path: Shared

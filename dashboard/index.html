@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTubeMinus Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f0f; color: #fff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #1f1f1f; border-radius: 12px; padding: 28px;
+      width: 100%; max-width: 460px;
+      box-shadow: 0 24px 48px rgba(0,0,0,.6);
+      text-align: center;
+    }
+    .icon { font-size: 48px; margin-bottom: 12px; }
+    h1 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .sub { font-size: 14px; color: #888; margin-bottom: 20px; }
+    img.thumb {
+      width: 100%; max-width: 320px; border-radius: 8px;
+      display: block; margin: 0 auto 16px;
+    }
+    .video-title {
+      font-size: 15px; font-weight: 600; margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .btn-group { display: flex; flex-direction: column; gap: 10px; }
+    .btn {
+      display: block; width: 100%; padding: 12px;
+      border: none; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; color: #fff;
+    }
+    .btn-approve { background: #16a34a; }
+    .btn-approve:hover { background: #15803d; }
+    .btn-deny { background: #dc2626; }
+    .btn-deny:hover { background: #b91c1c; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .duration-group {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      margin-bottom: 10px;
+    }
+    .duration-btn {
+      padding: 10px; border: 1px solid #16a34a; border-radius: 8px;
+      background: transparent; color: #4ade80; font-size: 13px;
+      font-weight: 600; cursor: pointer;
+    }
+    .duration-btn:hover { background: #14532d; }
+    .duration-btn.selected { background: #16a34a; color: #fff; border-color: #16a34a; }
+    .spinner {
+      width: 28px; height: 28px; border: 3px solid #333;
+      border-top-color: #ff0000; border-radius: 50%;
+      animation: spin .8s linear infinite; margin: 16px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .result-icon { font-size: 40px; margin-bottom: 12px; }
+    .result-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .result-sub { font-size: 14px; color: #888; }
+    .error { color: #f87171; font-size: 13px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+    // ── Config ────────────────────────────────────────────────────────────────
+    const SUPABASE_URL = 'https://tcyoaqqhnlibjmmukexh.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjeW9hcXFobmxpYmptbXVrZXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxOTY2MDgsImV4cCI6MjA5MTc3MjYwOH0.u-WIkAwPawybJPWAoQfjZrSdy2nghXLx24f_Byq3Weg';
+
+    const DURATIONS = [
+      { key: 'video_only',  label: 'This video only' },
+      { key: '30_minutes',  label: '30 minutes'       },
+      { key: '2_hours',     label: '2 hours'          },
+      { key: 'today_only',  label: 'Today only'       },
+    ];
+
+    // ── Boot ──────────────────────────────────────────────────────────────────
+    const params   = new URLSearchParams(location.search);
+    const id       = params.get('id');
+    const action   = params.get('action');      // 'deny' if deny link
+    const duration = params.get('duration');    // preset if approve link
+
+    async function boot() {
+      if (!id) { return showError('Missing request ID in URL.'); }
+
+      // Fetch request row
+      const req = await fetchRequest(id);
+      if (!req) { return showError('Request not found.'); }
+      if (req.status !== 'pending') { return showAlreadyActed(req); }
+
+      if (action === 'deny') {
+        renderDeny(req);
+      } else if (duration) {
+        // Deep link with preset duration — confirm then submit
+        renderConfirmApprove(req, duration);
+      } else {
+        renderChoose(req);
+      }
+    }
+
+    // ── Supabase helpers ──────────────────────────────────────────────────────
+    const headers = {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+    };
+
+    async function fetchRequest(id) {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/requests?id=eq.${encodeURIComponent(id)}&select=*`,
+        { headers }
+      );
+      const rows = await res.json();
+      return rows[0] || null;
+    }
+
+    function expiresAt(durationType) {
+      const now = Date.now();
+      const map = {
+        'video_only':  now + 6 * 3600_000,
+        '30_minutes':  now + 30 * 60_000,
+        '2_hours':     now + 2 * 3600_000,
+        'today_only':  (() => {
+          const d = new Date(); d.setHours(23, 59, 59, 999); return d.getTime();
+        })(),
+      };
+      return new Date(map[durationType] || now + 3600_000).toISOString();
+    }
+
+    async function approve(id, durationType) {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/requests?id=eq.${encodeURIComponent(id)}`,
+        {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({
+            status: 'approved',
+            duration_type: durationType,
+            expires_at: expiresAt(durationType),
+          }),
+        }
+      );
+      return res.ok;
+    }
+
+    async function deny(id) {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/requests?id=eq.${encodeURIComponent(id)}`,
+        {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ status: 'denied' }),
+        }
+      );
+      return res.ok;
+    }
+
+    // ── Views ─────────────────────────────────────────────────────────────────
+    const card = document.getElementById('card');
+
+    function thumb(req) {
+      if (!req.video_thumbnail) return '';
+      return `<img class="thumb" src="${esc(req.video_thumbnail)}" alt="">`;
+    }
+
+    function renderChoose(req) {
+      card.innerHTML = `
+        <div class="icon">🔒</div>
+        <h1>Isaac wants to watch</h1>
+        <p class="sub">${esc(req.reason || '')}</p>
+        ${thumb(req)}
+        <p class="video-title">${esc(req.video_title || 'Unknown Video')}</p>
+        <div class="btn-group">
+          <p style="font-size:13px;color:#aaa;margin-bottom:4px;text-align:left">Approve for:</p>
+          <div class="duration-group" id="dur-group"></div>
+          <button class="btn btn-deny" id="deny-btn">✗ Deny</button>
+          <p id="err" class="error" style="display:none"></p>
+        </div>
+      `;
+
+      const group = card.querySelector('#dur-group');
+      DURATIONS.forEach(({ key, label }) => {
+        const b = document.createElement('button');
+        b.className = 'duration-btn';
+        b.textContent = `✓ ${label}`;
+        b.addEventListener('click', async () => {
+          disableAll();
+          const ok = await approve(id, key);
+          ok ? showApproved(req, label) : showError('Failed to update — try again.');
+        });
+        group.appendChild(b);
+      });
+
+      card.querySelector('#deny-btn').addEventListener('click', async () => {
+        disableAll();
+        const ok = await deny(id);
+        ok ? showDenied(req) : showError('Failed to update — try again.');
+      });
+    }
+
+    function renderConfirmApprove(req, durationType) {
+      const dur = DURATIONS.find(d => d.key === durationType);
+      const label = dur ? dur.label : durationType;
+      card.innerHTML = `
+        <div class="icon">✅</div>
+        <h1>Approve for ${esc(label)}?</h1>
+        ${thumb(req)}
+        <p class="video-title">${esc(req.video_title || 'Unknown Video')}</p>
+        <div class="btn-group">
+          <button class="btn btn-approve" id="approve-btn">✓ Confirm — ${esc(label)}</button>
+          <button class="btn btn-deny" id="deny-btn" style="background:#555">✗ Deny instead</button>
+          <p id="err" class="error" style="display:none"></p>
+        </div>
+      `;
+      card.querySelector('#approve-btn').addEventListener('click', async () => {
+        disableAll();
+        const ok = await approve(id, durationType);
+        ok ? showApproved(req, label) : showError('Failed to update — try again.');
+      });
+      card.querySelector('#deny-btn').addEventListener('click', async () => {
+        disableAll();
+        const ok = await deny(id);
+        ok ? showDenied(req) : showError('Failed to update — try again.');
+      });
+    }
+
+    function renderDeny(req) {
+      card.innerHTML = `
+        <div class="icon">🚫</div>
+        <h1>Deny this request?</h1>
+        ${thumb(req)}
+        <p class="video-title">${esc(req.video_title || 'Unknown Video')}</p>
+        <div class="btn-group">
+          <button class="btn btn-deny" id="deny-btn">✗ Yes, deny</button>
+          <button class="btn" id="approve-btn" style="background:#555">← Back to approve</button>
+          <p id="err" class="error" style="display:none"></p>
+        </div>
+      `;
+      card.querySelector('#deny-btn').addEventListener('click', async () => {
+        disableAll();
+        const ok = await deny(id);
+        ok ? showDenied(req) : showError('Failed to update — try again.');
+      });
+      card.querySelector('#approve-btn').addEventListener('click', () => renderChoose(req));
+    }
+
+    function showApproved(req, durationLabel) {
+      card.innerHTML = `
+        <div class="result-icon">✅</div>
+        <p class="result-title">Approved</p>
+        <p class="result-sub">${esc(req.video_title || '')} — ${esc(durationLabel)}<br>
+        Isaac will be notified.</p>
+      `;
+    }
+
+    function showDenied(req) {
+      card.innerHTML = `
+        <div class="result-icon">🚫</div>
+        <p class="result-title">Denied</p>
+        <p class="result-sub">${esc(req.video_title || '')}<br>Isaac will be notified.</p>
+      `;
+    }
+
+    function showAlreadyActed(req) {
+      const label = req.status === 'approved' ? '✅ Already approved' : '🚫 Already denied';
+      card.innerHTML = `
+        <div class="result-icon">${req.status === 'approved' ? '✅' : '🚫'}</div>
+        <p class="result-title">${label}</p>
+        <p class="result-sub">${esc(req.video_title || '')}</p>
+      `;
+    }
+
+    function showError(msg) {
+      card.innerHTML = `
+        <div class="result-icon">⚠️</div>
+        <p class="result-title">Something went wrong</p>
+        <p class="result-sub" style="color:#f87171">${esc(msg)}</p>
+      `;
+    }
+
+    function disableAll() {
+      card.querySelectorAll('button').forEach(b => b.disabled = true);
+    }
+
+    function esc(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    boot().catch(e => showError(e.message));
+  </script>
+</body>
+</html>

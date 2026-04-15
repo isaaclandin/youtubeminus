@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "YouTubeMinus",
+  "version": "1.0.0",
+  "description": "YouTube accountability — every video requires Jenna's approval.",
+
+  "permissions": [
+    "storage",
+    "notifications",
+    "alarms",
+    "tabs"
+  ],
+
+  "host_permissions": [
+    "https://*.youtube.com/*",
+    "https://youtu.be/*",
+    "https://*.supabase.co/*",
+    "https://api.resend.com/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://*.youtube.com/*", "https://youtu.be/*"],
+      "js": [
+        "lib/config.js",
+        "lib/supabase.js",
+        "lib/youtube.js",
+        "lib/resend.js",
+        "overlay.js",
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+
+  "action": {
+    "default_popup": "popover/popover.html",
+    "default_icon": {
+      "16":  "icons/icon16.png",
+      "32":  "icons/icon32.png",
+      "48":  "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "YouTubeMinus"
+  },
+
+  "icons": {
+    "16":  "icons/icon16.png",
+    "32":  "icons/icon32.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["https://*.youtube.com/*", "https://youtu.be/*"]
+    }
+  ]
+}

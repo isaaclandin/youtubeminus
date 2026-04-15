@@ -1,0 +1,546 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0B2C804CEC5FA1665E6C6A70 /* PFFirewallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E876B934A89A4E0C8F9CB8 /* PFFirewallManager.swift */; };
+		180C84AC4466E560EF8A8B90 /* DoHResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8903418D14D2F97DB0C0E69 /* DoHResolver.swift */; };
+		260954CA3EEF2FC379A03002 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 456D7DE2C9187024A161A2BD /* Constants.swift */; };
+		2C1DFAE22BB9187DD380284C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518411F45D4B19F8894243D /* AppDelegate.swift */; };
+		3AD56F9CA227D9F13BD2B4D3 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F74A337406BF1DEC260DF3 /* MenuBarController.swift */; };
+		3C607E5A2F8B8960B7009B33 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900D2104009519786CB72277 /* main.swift */; };
+		48DD309808EFFCFE9C9CB122 /* ResendClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6D41510C61BB7708EDEBBF /* ResendClient.swift */; };
+		6E672BD7F4A8CD1C70E66E70 /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9856B0A8A7FED5312BD423D1 /* SetupView.swift */; };
+		7DC1D38C0195484241BA8328 /* SignatureVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9A54CB840010839A22A1F6 /* SignatureVerifier.swift */; };
+		84088E4055524DB3066FDB64 /* HelperManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C57303D1A9B09CDAE266F1 /* HelperManager.swift */; };
+		A1683282361DEF28920F3FD4 /* ChromePolicyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51CEEE2BD1351D6047D5E82 /* ChromePolicyManager.swift */; };
+		A52F0AD49FFEBA99C1EEC4E1 /* XPCProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A12280732A7D7FC1C7932F0 /* XPCProtocol.swift */; };
+		A6747D3D57EAFE27D5C62FA5 /* TamperWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54EB9BFE4125F7FB9A133021 /* TamperWatcher.swift */; };
+		B1E6C82C1980C79D42CCA6A2 /* AlertMailer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8465E35071ADCAC98E6CB57A /* AlertMailer.swift */; };
+		B38A6BCC8D7CB7ABBEC3DE23 /* ChromeProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFCEAF345DCEC77491AC5913 /* ChromeProxy.swift */; };
+		B3C3088DC77AA239A6704A42 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 456D7DE2C9187024A161A2BD /* Constants.swift */; };
+		B3F796BE548ED7CCA23D2415 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CF384118ABE490BFCE987C /* KeychainHelper.swift */; };
+		B8517DDE3DBD59F4A29DBE26 /* YouTubeMinusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F87397050814B9EE43427F /* YouTubeMinusApp.swift */; };
+		D10460BE3D624954682459F7 /* XPCListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF3A19FD1F8A26736A46961 /* XPCListener.swift */; };
+		D3CA0F93E9A9EC652C168FCB /* HelperInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB5B5A8EB9C63EAEA885B85 /* HelperInstaller.swift */; };
+		D8FF3DE228C12B8B410BF6DF /* DNSServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091C60EECFD021720C344C31 /* DNSServer.swift */; };
+		DA433E4B6C86A74349FB876D /* HelperKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD970F0983CF2B318C272 /* HelperKeychain.swift */; };
+		DCCB11F2472946F9361AA204 /* XPCProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A12280732A7D7FC1C7932F0 /* XPCProtocol.swift */; };
+		EAA251CC17355CEF5AE8D6FA /* SystemDNSManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45F00636E4883AD2CA6E8B40 /* SystemDNSManager.swift */; };
+		FF3FB1564402C87D75C390D4 /* StatusPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BC3105DE99FE8952EF6738B /* StatusPopoverView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3DF0BAE474791CCA05F57660 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CB8457A13A3B2D76D0844413 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 14B11341682B1D93F69FD5D9;
+			remoteInfo = YouTubeMinusHelper;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		091C60EECFD021720C344C31 /* DNSServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DNSServer.swift; sourceTree = "<group>"; };
+		0BC3105DE99FE8952EF6738B /* StatusPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusPopoverView.swift; sourceTree = "<group>"; };
+		275AD970F0983CF2B318C272 /* HelperKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperKeychain.swift; sourceTree = "<group>"; };
+		3A12280732A7D7FC1C7932F0 /* XPCProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XPCProtocol.swift; sourceTree = "<group>"; };
+		3CFA01192A0EF7B6BA0C4014 /* YouTubeMinus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YouTubeMinus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		456D7DE2C9187024A161A2BD /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		45F00636E4883AD2CA6E8B40 /* SystemDNSManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemDNSManager.swift; sourceTree = "<group>"; };
+		49F87397050814B9EE43427F /* YouTubeMinusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YouTubeMinusApp.swift; sourceTree = "<group>"; };
+		54C57303D1A9B09CDAE266F1 /* HelperManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperManager.swift; sourceTree = "<group>"; };
+		54EB9BFE4125F7FB9A133021 /* TamperWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamperWatcher.swift; sourceTree = "<group>"; };
+		656112D91F6830F620F04D93 /* YouTubeMinusHelper */ = {isa = PBXFileReference; includeInIndex = 0; path = YouTubeMinusHelper; sourceTree = BUILT_PRODUCTS_DIR; };
+		7518411F45D4B19F8894243D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7C9A54CB840010839A22A1F6 /* SignatureVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureVerifier.swift; sourceTree = "<group>"; };
+		7F6D41510C61BB7708EDEBBF /* ResendClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResendClient.swift; sourceTree = "<group>"; };
+		8465E35071ADCAC98E6CB57A /* AlertMailer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertMailer.swift; sourceTree = "<group>"; };
+		8AF3A19FD1F8A26736A46961 /* XPCListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XPCListener.swift; sourceTree = "<group>"; };
+		8BB5B5A8EB9C63EAEA885B85 /* HelperInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperInstaller.swift; sourceTree = "<group>"; };
+		900D2104009519786CB72277 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		95F74A337406BF1DEC260DF3 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		9856B0A8A7FED5312BD423D1 /* SetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupView.swift; sourceTree = "<group>"; };
+		AFCEAF345DCEC77491AC5913 /* ChromeProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromeProxy.swift; sourceTree = "<group>"; };
+		B4E876B934A89A4E0C8F9CB8 /* PFFirewallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PFFirewallManager.swift; sourceTree = "<group>"; };
+		B51CEEE2BD1351D6047D5E82 /* ChromePolicyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromePolicyManager.swift; sourceTree = "<group>"; };
+		D8CF384118ABE490BFCE987C /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		F8903418D14D2F97DB0C0E69 /* DoHResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoHResolver.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		5E28A70EB11A7C13F20AEF57 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3CFA01192A0EF7B6BA0C4014 /* YouTubeMinus.app */,
+				656112D91F6830F620F04D93 /* YouTubeMinusHelper */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		633BA86FB24CCF842FD189B9 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9856B0A8A7FED5312BD423D1 /* SetupView.swift */,
+				0BC3105DE99FE8952EF6738B /* StatusPopoverView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A891B9F2E3BB4CBFCEB3D7CE /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				456D7DE2C9187024A161A2BD /* Constants.swift */,
+				3A12280732A7D7FC1C7932F0 /* XPCProtocol.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		A99463D4FA866A4F92087AFE /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				95F74A337406BF1DEC260DF3 /* MenuBarController.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		D7377025668AF5BFE9C74744 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				8BB5B5A8EB9C63EAEA885B85 /* HelperInstaller.swift */,
+				54C57303D1A9B09CDAE266F1 /* HelperManager.swift */,
+				D8CF384118ABE490BFCE987C /* KeychainHelper.swift */,
+				7F6D41510C61BB7708EDEBBF /* ResendClient.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		E19D3238C6C979B06DF659EA /* YouTubeMinus */ = {
+			isa = PBXGroup;
+			children = (
+				EF94B57D3C02416C653DED67 /* App */,
+				A99463D4FA866A4F92087AFE /* MenuBar */,
+				D7377025668AF5BFE9C74744 /* Services */,
+				633BA86FB24CCF842FD189B9 /* Views */,
+			);
+			path = YouTubeMinus;
+			sourceTree = "<group>";
+		};
+		EE56BE68C4FBCFC0C6E7D833 /* YouTubeMinusHelper */ = {
+			isa = PBXGroup;
+			children = (
+				8465E35071ADCAC98E6CB57A /* AlertMailer.swift */,
+				B51CEEE2BD1351D6047D5E82 /* ChromePolicyManager.swift */,
+				AFCEAF345DCEC77491AC5913 /* ChromeProxy.swift */,
+				091C60EECFD021720C344C31 /* DNSServer.swift */,
+				F8903418D14D2F97DB0C0E69 /* DoHResolver.swift */,
+				275AD970F0983CF2B318C272 /* HelperKeychain.swift */,
+				900D2104009519786CB72277 /* main.swift */,
+				B4E876B934A89A4E0C8F9CB8 /* PFFirewallManager.swift */,
+				7C9A54CB840010839A22A1F6 /* SignatureVerifier.swift */,
+				45F00636E4883AD2CA6E8B40 /* SystemDNSManager.swift */,
+				54EB9BFE4125F7FB9A133021 /* TamperWatcher.swift */,
+				8AF3A19FD1F8A26736A46961 /* XPCListener.swift */,
+			);
+			path = YouTubeMinusHelper;
+			sourceTree = "<group>";
+		};
+		EF94B57D3C02416C653DED67 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				7518411F45D4B19F8894243D /* AppDelegate.swift */,
+				49F87397050814B9EE43427F /* YouTubeMinusApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		FF77A8250EC7327E9F149BB9 = {
+			isa = PBXGroup;
+			children = (
+				A891B9F2E3BB4CBFCEB3D7CE /* Shared */,
+				E19D3238C6C979B06DF659EA /* YouTubeMinus */,
+				EE56BE68C4FBCFC0C6E7D833 /* YouTubeMinusHelper */,
+				5E28A70EB11A7C13F20AEF57 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		087879A3959B9F8F20463486 /* YouTubeMinus */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2F7FDA99D9B01422600367C2 /* Build configuration list for PBXNativeTarget "YouTubeMinus" */;
+			buildPhases = (
+				B1CBCED7F581E3A4FDB2137A /* Sources */,
+				50C94AC5C53BF2B9ADB02FFB /* Copy helper into bundle */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FBE178A48214A48D2AA7D76D /* PBXTargetDependency */,
+			);
+			name = YouTubeMinus;
+			packageProductDependencies = (
+			);
+			productName = YouTubeMinus;
+			productReference = 3CFA01192A0EF7B6BA0C4014 /* YouTubeMinus.app */;
+			productType = "com.apple.product-type.application";
+		};
+		14B11341682B1D93F69FD5D9 /* YouTubeMinusHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 168FECA3432361D984B222E7 /* Build configuration list for PBXNativeTarget "YouTubeMinusHelper" */;
+			buildPhases = (
+				1438948962B9E704F20454A3 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = YouTubeMinusHelper;
+			packageProductDependencies = (
+			);
+			productName = YouTubeMinusHelper;
+			productReference = 656112D91F6830F620F04D93 /* YouTubeMinusHelper */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CB8457A13A3B2D76D0844413 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					087879A3959B9F8F20463486 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+					14B11341682B1D93F69FD5D9 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 7FFE5DDF35F96D85C57CD9D2 /* Build configuration list for PBXProject "YouTubeMinus" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = FF77A8250EC7327E9F149BB9;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5E28A70EB11A7C13F20AEF57 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				087879A3959B9F8F20463486 /* YouTubeMinus */,
+				14B11341682B1D93F69FD5D9 /* YouTubeMinusHelper */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		50C94AC5C53BF2B9ADB02FFB /* Copy helper into bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy helper into bundle";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "DEST_BIN=\"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/MacOS/YouTubeMinusHelper\"\nDEST_PLIST=\"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH/LaunchDaemons/com.youtubeminus.helper.plist\"\nmkdir -p \"$(dirname $DEST_PLIST)\"\ncp -f \"$BUILT_PRODUCTS_DIR/YouTubeMinusHelper\" \"$DEST_BIN\"\ncp -f \"$SRCROOT/LaunchDaemon/com.youtubeminus.helper.plist\" \"$DEST_PLIST\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1438948962B9E704F20454A3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1E6C82C1980C79D42CCA6A2 /* AlertMailer.swift in Sources */,
+				A1683282361DEF28920F3FD4 /* ChromePolicyManager.swift in Sources */,
+				B38A6BCC8D7CB7ABBEC3DE23 /* ChromeProxy.swift in Sources */,
+				B3C3088DC77AA239A6704A42 /* Constants.swift in Sources */,
+				D8FF3DE228C12B8B410BF6DF /* DNSServer.swift in Sources */,
+				180C84AC4466E560EF8A8B90 /* DoHResolver.swift in Sources */,
+				DA433E4B6C86A74349FB876D /* HelperKeychain.swift in Sources */,
+				0B2C804CEC5FA1665E6C6A70 /* PFFirewallManager.swift in Sources */,
+				7DC1D38C0195484241BA8328 /* SignatureVerifier.swift in Sources */,
+				EAA251CC17355CEF5AE8D6FA /* SystemDNSManager.swift in Sources */,
+				A6747D3D57EAFE27D5C62FA5 /* TamperWatcher.swift in Sources */,
+				D10460BE3D624954682459F7 /* XPCListener.swift in Sources */,
+				A52F0AD49FFEBA99C1EEC4E1 /* XPCProtocol.swift in Sources */,
+				3C607E5A2F8B8960B7009B33 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B1CBCED7F581E3A4FDB2137A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C1DFAE22BB9187DD380284C /* AppDelegate.swift in Sources */,
+				260954CA3EEF2FC379A03002 /* Constants.swift in Sources */,
+				D3CA0F93E9A9EC652C168FCB /* HelperInstaller.swift in Sources */,
+				84088E4055524DB3066FDB64 /* HelperManager.swift in Sources */,
+				B3F796BE548ED7CCA23D2415 /* KeychainHelper.swift in Sources */,
+				3AD56F9CA227D9F13BD2B4D3 /* MenuBarController.swift in Sources */,
+				48DD309808EFFCFE9C9CB122 /* ResendClient.swift in Sources */,
+				6E672BD7F4A8CD1C70E66E70 /* SetupView.swift in Sources */,
+				FF3FB1564402C87D75C390D4 /* StatusPopoverView.swift in Sources */,
+				DCCB11F2472946F9361AA204 /* XPCProtocol.swift in Sources */,
+				B8517DDE3DBD59F4A29DBE26 /* YouTubeMinusApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FBE178A48214A48D2AA7D76D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 14B11341682B1D93F69FD5D9 /* YouTubeMinusHelper */;
+			targetProxy = 3DF0BAE474791CCA05F57660 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		47153E6F9B18C51D3053F94B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		53B866D39EDEB382431B57EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = YouTubeMinus/YouTubeMinus.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = YouTubeMinus/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.youtubeminus.app;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		5C18040846A1F250837ABBEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "YouTubeMinus Developer";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		7D0ECD10CCD1DFACF0FF9996 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YouTubeMinusHelper/YouTubeMinusHelper.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = YouTubeMinusHelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.youtubeminus.helper;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		D4A722AAB4E350885EFC3DF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = YouTubeMinus/YouTubeMinus.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = YouTubeMinus/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.youtubeminus.app;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		EFB1B51111820CA3E8F6A8DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = YouTubeMinusHelper/YouTubeMinusHelper.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = YouTubeMinusHelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.youtubeminus.helper;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		168FECA3432361D984B222E7 /* Build configuration list for PBXNativeTarget "YouTubeMinusHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7D0ECD10CCD1DFACF0FF9996 /* Debug */,
+				EFB1B51111820CA3E8F6A8DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		2F7FDA99D9B01422600367C2 /* Build configuration list for PBXNativeTarget "YouTubeMinus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53B866D39EDEB382431B57EE /* Debug */,
+				D4A722AAB4E350885EFC3DF4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7FFE5DDF35F96D85C57CD9D2 /* Build configuration list for PBXProject "YouTubeMinus" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				47153E6F9B18C51D3053F94B /* Debug */,
+				5C18040846A1F250837ABBEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CB8457A13A3B2D76D0844413 /* Project object */;
+}

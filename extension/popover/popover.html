@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTubeMinus</title>
+  <link rel="stylesheet" href="popover.css">
+</head>
+<body>
+  <div id="app">
+
+    <header>
+      <span class="logo">🔒</span>
+      <span class="logo-text">YouTubeMinus</span>
+    </header>
+
+    <!-- Active Approvals -->
+    <section id="section-active">
+      <h2 class="section-title">Active</h2>
+      <div id="active-list"></div>
+      <p id="active-empty" class="empty-msg hidden">No active approvals</p>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Pending Requests -->
+    <section id="section-pending">
+      <h2 class="section-title">Pending</h2>
+      <div id="pending-list"></div>
+      <p id="pending-empty" class="empty-msg hidden">No pending requests</p>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- History -->
+    <section id="section-history">
+      <h2 class="section-title">History</h2>
+      <div id="history-list"></div>
+      <p id="history-empty" class="empty-msg hidden">No history yet</p>
+    </section>
+
+  </div>
+
+  <script src="../lib/config.js"></script>
+  <script src="../lib/supabase.js"></script>
+  <script src="../lib/youtube.js"></script>
+  <script src="popover.js"></script>
+</body>
+</html>

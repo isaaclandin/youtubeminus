@@ -1,0 +1,119 @@
+// Thin Supabase REST API wrapper — no npm package, no bundler needed.
+// Uses YTM_CONFIG defined in config.js (loaded first).
+
+const SUPABASE = (() => {
+  function headers(extras = {}) {
+    return {
+      'apikey':        YTM_CONFIG.supabaseKey,
+      'Authorization': `Bearer ${YTM_CONFIG.supabaseKey}`,
+      'Content-Type':  'application/json',
+      'Prefer':        'return=representation',
+      ...extras,
+    };
+  }
+
+  async function req(path, opts = {}) {
+    try {
+      const res = await fetch(`${YTM_CONFIG.supabaseUrl}/rest/v1/${path}`, {
+        headers: headers(opts.headers),
+        ...opts,
+      });
+      if (!res.ok) {
+        console.error('[SUPABASE]', res.status, await res.text());
+        return null;
+      }
+      const text = await res.text();
+      return text ? JSON.parse(text) : null;
+    } catch (e) {
+      console.error('[SUPABASE] fetch error:', e);
+      return null;
+    }
+  }
+
+  function first(rows) {
+    return Array.isArray(rows) && rows.length > 0 ? rows[0] : null;
+  }
+
+  // ── Public API ──────────────────────────────────────────────────────────────
+
+  return {
+    // Returns the active (approved + not expired) approval for a video, or null.
+    async getActiveApproval(videoId) {
+      const now = new Date().toISOString();
+      const rows = await req(
+        `requests?video_id=eq.${encodeURIComponent(videoId)}&status=eq.approved&expires_at=gt.${encodeURIComponent(now)}&order=created_at.desc&limit=1`
+      );
+      return first(rows);
+    },
+
+    // Returns the most recent pending request for a video, or null.
+    async getPendingRequest(videoId) {
+      const rows = await req(
+        `requests?video_id=eq.${encodeURIComponent(videoId)}&status=eq.pending&order=created_at.desc&limit=1`
+      );
+      return first(rows);
+    },
+
+    // Returns the most recent approved/pending/denied request for a video.
+    async getLatestRequest(videoId) {
+      const rows = await req(
+        `requests?video_id=eq.${encodeURIComponent(videoId)}&status=in.(approved,pending,denied)&order=created_at.desc&limit=1`
+      );
+      return first(rows);
+    },
+
+    // Create a new pending request. Returns the created row.
+    async createRequest({ videoId, videoTitle, videoThumbnail, reason }) {
+      const rows = await req('requests', {
+        method: 'POST',
+        body: JSON.stringify({
+          video_id:        videoId,
+          video_title:     videoTitle,
+          video_thumbnail: videoThumbnail,
+          reason:          reason,
+          status:          'pending',
+        }),
+      });
+      return first(rows);
+    },
+
+    // Set a request's status to 'released'.
+    async releaseApproval(requestId) {
+      const rows = await req(`requests?id=eq.${requestId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: 'released' }),
+      });
+      return first(rows);
+    },
+
+    // All active (approved + not expired) approvals — used by popup + background.
+    async getAllActive() {
+      const now = new Date().toISOString();
+      return req(
+        `requests?status=eq.approved&expires_at=gt.${encodeURIComponent(now)}&order=expires_at.asc`
+      ) ?? [];
+    },
+
+    // All pending requests — used by popup.
+    async getAllPending() {
+      return req('requests?status=eq.pending&order=created_at.desc') ?? [];
+    },
+
+    // Recent history — used by popup.
+    async getHistory(limit = 10) {
+      return req(
+        `requests?status=in.(approved,denied,expired,released)&order=created_at.desc&limit=${limit}`
+      ) ?? [];
+    },
+
+    // Approvals that became active in the last hour — used by background poller
+    // to detect newly-approved requests and fire browser notifications.
+    async getRecentlyApproved() {
+      const hourAgo = new Date(Date.now() - 3_600_000).toISOString();
+      const now     = new Date().toISOString();
+      return req(
+        `requests?status=eq.approved&approved_at=gt.${encodeURIComponent(hourAgo)}&expires_at=gt.${encodeURIComponent(now)}&order=approved_at.desc`
+      ) ?? [];
+    },
+  };
+})();
