@@ -19,6 +19,12 @@ const YTMOverlay = (() => {
     shadow = host.attachShadow({ mode: 'open' });
     shadow.innerHTML = `<style>${GATE_CSS}</style><div id="gate" class="gate hidden"></div>`;
     document.body.appendChild(host);
+
+    // Shadow DOM clicks bubble up and reach YouTube's global handlers (which
+    // interpret them as navigation, triggering the mini-player). Stop all
+    // pointer + keyboard events from escaping the host element.
+    ['click', 'mousedown', 'mouseup', 'keydown', 'keyup', 'keypress', 'pointerdown', 'pointerup']
+      .forEach(evt => host.addEventListener(evt, e => e.stopImmediatePropagation()));
   }
 
   function gate() {
@@ -157,14 +163,28 @@ const YTMOverlay = (() => {
 
   // ── Gate states ──────────────────────────────────────────────────────────────
 
+  let videoPauseInterval = null;
+
   function showGate(html) {
     const g = gate();
     g.innerHTML = html;
     g.classList.remove('hidden');
+    pauseVideos();
+    // YouTube sometimes auto-resumes; keep suppressing until gate is hidden.
+    clearInterval(videoPauseInterval);
+    videoPauseInterval = setInterval(pauseVideos, 500);
   }
 
   function hideGate() {
+    clearInterval(videoPauseInterval);
+    videoPauseInterval = null;
     gate().classList.add('hidden');
+  }
+
+  function pauseVideos() {
+    document.querySelectorAll('video').forEach(v => {
+      if (!v.paused) v.pause();
+    });
   }
 
   // Loading spinner while we query Supabase

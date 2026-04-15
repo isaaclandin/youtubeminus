@@ -53,7 +53,7 @@ const RESEND = (() => {
     ];
     return durations
       .map(([d, label]) =>
-        btn(`${dashboardUrl}/approve?id=${requestId}&duration=${d}`, `✓ ${label}`, '#16a34a'))
+        btn(`${dashboardUrl}?id=${requestId}&duration=${d}`, `✓ ${label}`, '#16a34a'))
       .join('');
   }
 
@@ -72,7 +72,7 @@ const RESEND = (() => {
         <p style="margin:0 0 8px;font-weight:600">Approve for:</p>
         ${approveLinks(d, requestId)}
         <br>
-        ${btn(`${d}/deny?id=${requestId}`, '✗ Deny', '#dc2626')}
+        ${btn(`${d}?id=${requestId}&action=deny`, '✗ Deny', '#dc2626')}
         <p style="margin:24px 0 0">
           <a href="${d}" style="color:#666;font-size:13px">Open dashboard →</a>
         </p>
