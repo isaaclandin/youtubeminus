@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "YouTubeMinus",
   "version": "1.0.0",
-  "description": "YouTube accountability — every video requires Jenna's approval.",
+  "description": "YouTube accountability — every video requires your partner's approval.",
 
   "permissions": [
     "storage",

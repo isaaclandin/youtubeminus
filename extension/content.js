@@ -169,10 +169,36 @@
 
   function enterRequestState(videoId, info) {
     YTMOverlay.showRequest(videoId, info, async (reason) => {
+      // Check sign-in first
+      const session = await AUTH.getSession();
+      if (!session) {
+        YTMOverlay.showError('Sign in to YouTubeMinus via the extension popup first.');
+        return;
+      }
+
       // Look up active relationships to get relationship_id and partner chat IDs
       const relationships = await SUPABASE.getActiveRelationships();
-      const primaryRel = relationships[0];
-      const partnerChatIds = relationships
+      const primaryRel = relationships.find(r => r.role === 'primary') || relationships[0];
+
+      if (!primaryRel) {
+        YTMOverlay.showError('No active accountability partner found. Set one up at youtubeminus.vercel.app');
+        return;
+      }
+
+      // Split primary vs co-approver chat IDs for escalation logic
+      const now = new Date();
+      const explicitPrimary = relationships
+        .filter(r => r.role === 'primary')
+        .map(r => r.partner?.telegram_chat_id)
+        .filter(Boolean);
+
+      // Fall back to all partners if the role column hasn't been populated yet
+      const primaryChatIds = explicitPrimary.length
+        ? explicitPrimary
+        : relationships.map(r => r.partner?.telegram_chat_id).filter(Boolean);
+
+      const coApproverChatIds = relationships
+        .filter(r => r.role === 'co_approver' && (!r.cooldown_until || new Date(r.cooldown_until) <= now))
         .map(r => r.partner?.telegram_chat_id)
         .filter(Boolean);
 
@@ -182,7 +208,7 @@
         videoTitle:     info.title,
         videoThumbnail: info.thumbnail,
         reason,
-        relationshipId: primaryRel?.id,
+        relationshipId: primaryRel.id,
       });
 
       if (!request) {
@@ -191,15 +217,29 @@
         return;
       }
 
-      // Tell background to send partner(s) the Telegram notification
+      // Notify primary partner(s) immediately
       chrome.runtime.sendMessage({
         type:           'SEND_REQUEST_EMAIL',
         requestId:      request.id,
         videoTitle:     info.title,
         videoThumbnail: info.thumbnail,
         reason,
-        partnerChatIds,
+        partnerChatIds: primaryChatIds,
       });
+
+      // Schedule escalation to co-approvers after 15 minutes if still pending
+      if (coApproverChatIds.length) {
+        chrome.runtime.sendMessage({
+          type:              'SCHEDULE_ESCALATION',
+          requestId:         request.id,
+          videoId:           videoId,
+          videoTitle:        info.title,
+          videoThumbnail:    info.thumbnail,
+          reason,
+          coApproverChatIds,
+          delayMs:           15 * 60 * 1000,
+        });
+      }
 
       enterPendingState(request, info, videoId);
     });

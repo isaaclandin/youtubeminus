@@ -6,10 +6,10 @@ export function generateInviteLink(token: string): string {
 
 export function getDurationLabel(d: DurationType): string {
   const map: Record<DurationType, string> = {
-    '1_day': '1 day',
+    '1_day':  '1 day',
     '1_week': '1 week',
   }
-  return map[d]
+  return map[d] ?? d
 }
 
 export function isExpired(expiresAt: string): boolean {

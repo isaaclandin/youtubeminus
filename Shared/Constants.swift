@@ -64,21 +64,25 @@ enum Constants {
         "34.64.0.0/10"
     ]
 
+    // ── Supabase (used by macOS app to push uninstall code to partner dashboard) ─
+    static let supabaseURL = "https://tcyoaqqhnlibjmmukexh.supabase.co"
+    static let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRjeW9hcXFobmxpYmptbXVrZXhoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxOTY2MDgsImV4cCI6MjA5MTc3MjYwOH0.u-WIkAwPawybJPWAoQfjZrSdy2nghXLx24f_Byq3Weg"
+    // ─────────────────────────────────────────────────────────────────────────
+
     // Tamper check interval
     static let tamperCheckInterval: TimeInterval = 60
 
     // Keychain (stored in system keychain — only root can access)
     enum Keychain {
-        static let service          = "com.youtubeminus"
-        static let passwordHashKey  = "protection-password-hash"
-        static let passwordSaltKey  = "protection-password-salt"
-        static let jennaEmailKey    = "jenna-email"
-        static let resendKeyKey     = "resend-api-key"
+        static let service             = "com.youtubeminus"
+        static let uninstallCodeHash   = "uninstall-code-hash"
+        static let uninstallCodeSalt   = "uninstall-code-salt"
+        /// Newline-separated list of partner Telegram chat IDs for tamper alerts
+        static let partnerChatIds      = "partner-chat-ids"
     }
 
     // ── Telegram (tamper alerts from the macOS helper) ───────────────────────
     static let telegramBotToken = "8736854276:AAEt6MCpPyenNX3Hda5St-uLTvIo33kLs-A"
-    static let jennaChatId      = "6770280815" // temp: Isaac's ID until Jenna sets up Telegram
-    static let isaacChatId      = "6770280815"
+    // partnerChatId is fetched from the web app at runtime; no hardcoded ID here
     // ─────────────────────────────────────────────────────────────────────────
 }

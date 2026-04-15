@@ -62,7 +62,7 @@ struct StatusPopoverView: View {
 
             Divider()
 
-            // Bottom — quit is password-gated, no disable option
+            // Bottom — quit is uninstall-code-gated, no disable option
             HStack {
                 Text("v\(Bundle.main.shortVersionString)")
                     .font(.caption2)
@@ -99,7 +99,7 @@ struct StatusPopoverView: View {
 
     private func openDashboard() {
         menuBarController?.closePopover()
-        if let url = URL(string: "https://isaaclandin.github.io/youtubeminus/dashboard") {
+        if let url = URL(string: "https://youtubeminus.vercel.app/dashboard") {
             NSWorkspace.shared.open(url)
         }
     }

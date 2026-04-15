@@ -393,11 +393,22 @@ const YTMOverlay = (() => {
     watchModStyle = null;
   }
 
+  function showError(message) {
+    showGate(`
+      <div class="card center">
+        <span class="lock-icon">⚠️</span>
+        <p class="blocked-title">YouTubeMinus</p>
+        <p class="blocked-sub">${message}</p>
+      </div>
+    `);
+  }
+
   // ── Public API ───────────────────────────────────────────────────────────────
 
   return {
     showLoading,
     showBlocked,
+    showError,
     showRequest,
     showPending,
     showDenied,

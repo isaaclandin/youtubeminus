@@ -18,6 +18,7 @@ interface NeedsResponseProps {
   ownerNames: Record<string, string>
   partnerName: string
   onUpdate: () => void
+  canApproveByRelId?: Record<string, boolean>
 }
 
 interface RequestItemProps {
@@ -26,10 +27,11 @@ interface RequestItemProps {
   partnerChatId?: string
   ownerName: string
   partnerName: string
+  canApprove?: boolean
   onUpdate: () => void
 }
 
-function RequestItem({ req, ownerChatId, partnerChatId, ownerName, partnerName, onUpdate }: RequestItemProps) {
+function RequestItem({ req, ownerChatId, partnerChatId, ownerName, partnerName, canApprove = true, onUpdate }: RequestItemProps) {
   const [selectedDuration, setSelectedDuration] = useState<DurationType | null>('1_day')
   const [loading, setLoading] = useState(false)
 
@@ -92,29 +94,37 @@ function RequestItem({ req, ownerChatId, partnerChatId, ownerName, partnerName, 
           <span className="text-neutral-500">Reason: </span>{req.reason}
         </p>
       )}
-      <DurationPicker value={selectedDuration} onChange={setSelectedDuration} />
-      <div className="flex gap-2">
-        <button
-          onClick={handleApprove}
-          disabled={loading || !selectedDuration}
-          className={`flex-1 py-2 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 ${
-            canOverride
-              ? 'bg-yellow-600 hover:bg-yellow-500 text-white'
-              : 'bg-red-600 hover:bg-red-500 text-white'
-          }`}
-        >
-          {loading ? 'Processing...' : canOverride ? 'Override & Approve' : 'Approve'}
-        </button>
-        {!isDenied && (
-          <button
-            onClick={handleDeny}
-            disabled={loading}
-            className="px-4 py-2 rounded-lg font-medium text-sm text-neutral-400 border border-neutral-700 hover:border-neutral-500 hover:text-white transition-colors disabled:opacity-50"
-          >
-            Deny
-          </button>
-        )}
-      </div>
+      {canApprove ? (
+        <>
+          <DurationPicker value={selectedDuration} onChange={setSelectedDuration} />
+          <div className="flex gap-2">
+            <button
+              onClick={handleApprove}
+              disabled={loading || !selectedDuration}
+              className={`flex-1 py-2 rounded-lg font-medium text-sm transition-colors disabled:opacity-50 ${
+                canOverride
+                  ? 'bg-yellow-600 hover:bg-yellow-500 text-white'
+                  : 'bg-red-600 hover:bg-red-500 text-white'
+              }`}
+            >
+              {loading ? 'Processing...' : canOverride ? 'Override & Approve' : 'Approve'}
+            </button>
+            {!isDenied && (
+              <button
+                onClick={handleDeny}
+                disabled={loading}
+                className="px-4 py-2 rounded-lg font-medium text-sm text-neutral-400 border border-neutral-700 hover:border-neutral-500 hover:text-white transition-colors disabled:opacity-50"
+              >
+                Deny
+              </button>
+            )}
+          </div>
+        </>
+      ) : (
+        <div className="bg-yellow-900/20 border border-yellow-800/50 rounded-lg px-3 py-2 text-yellow-400/70 text-xs text-center">
+          You're in a 12-hour cooldown period as a new co-approver — you can view but not approve requests yet.
+        </div>
+      )}
     </div>
   )
 }
@@ -126,6 +136,7 @@ export function NeedsResponse({
   ownerNames,
   partnerName,
   onUpdate,
+  canApproveByRelId = {},
 }: NeedsResponseProps) {
   const actionable = requests.filter((r) => {
     if (r.status === 'pending') return true
@@ -146,6 +157,7 @@ export function NeedsResponse({
           partnerChatId={partnerChatIds[req.relationship_id]}
           ownerName={ownerNames[req.relationship_id] || 'Owner'}
           partnerName={partnerName}
+          canApprove={canApproveByRelId[req.relationship_id] !== false}
           onUpdate={onUpdate}
         />
       ))}

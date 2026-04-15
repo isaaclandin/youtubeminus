@@ -39,38 +39,36 @@ final class MenuBarController {
 
     // MARK: - Password-gated actions
 
-    /// Shows a password prompt. Calls completion(true) only if Jenna's
-    /// password is verified by the helper. Sends tamper alert on failure.
-    func requestPasswordForAction(action: String, completion: @escaping (Bool) -> Void) {
+    /// Shows an uninstall code prompt. Calls completion(true) only if the code
+    /// is verified by the helper. Sends a tamper alert on repeated failure.
+    func requestUninstallCodeForAction(action: String, completion: @escaping (Bool) -> Void) {
         let alert = NSAlert()
-        alert.messageText = "This action requires Jenna's password"
-        alert.informativeText = "Enter the protection password to \(action)."
+        alert.messageText = "Uninstall code required"
+        alert.informativeText = "Enter the uninstall code from your accountability partner's dashboard to \(action)."
         alert.alertStyle = .warning
 
-        let passwordField = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
-        passwordField.placeholderString = "Protection password"
-        alert.accessoryView = passwordField
+        let codeField = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
+        codeField.placeholderString = "XXXX-XXXX"
+        alert.accessoryView = codeField
         alert.addButton(withTitle: "Confirm")
         alert.addButton(withTitle: "Cancel")
 
-        // Attempt counter stored across invocations
-        attemptPasswordVerification(alert: alert, field: passwordField, action: action,
-                                    attemptsLeft: 3, completion: completion)
+        attemptCodeVerification(alert: alert, field: codeField, action: action,
+                                attemptsLeft: 3, completion: completion)
     }
 
-    private func attemptPasswordVerification(alert: NSAlert, field: NSSecureTextField,
-                                              action: String, attemptsLeft: Int,
-                                              completion: @escaping (Bool) -> Void) {
+    private func attemptCodeVerification(alert: NSAlert, field: NSSecureTextField,
+                                          action: String, attemptsLeft: Int,
+                                          completion: @escaping (Bool) -> Void) {
         let response = alert.runModal()
         guard response == .alertFirstButtonReturn else {
-            // User clicked Cancel — count as a tamper attempt
             HelperManager.shared.reportTamperAttempt(what: "cancel on \(action) prompt")
             completion(false)
             return
         }
 
         let entered = field.stringValue
-        HelperManager.shared.verifyPassword(entered) { [weak self] ok in
+        HelperManager.shared.verifyUninstallCode(entered) { [weak self] ok in
             DispatchQueue.main.async {
                 if ok {
                     completion(true)
@@ -78,28 +76,28 @@ final class MenuBarController {
                     let remaining = attemptsLeft - 1
                     let body: String
                     if remaining == 0 {
-                        body = "Three failed password attempts to \(action)."
-                        HelperManager.shared.reportTamperAttempt(what: "3 failed password attempts to \(action)")
+                        body = "Three failed attempts to \(action)."
+                        HelperManager.shared.reportTamperAttempt(what: "3 failed code attempts to \(action)")
                         completion(false)
                         return
                     } else {
-                        body = "Wrong password. \(remaining) attempt(s) remaining."
-                        HelperManager.shared.reportTamperAttempt(what: "failed password attempt to \(action)")
+                        body = "Wrong code. \(remaining) attempt(s) remaining."
+                        HelperManager.shared.reportTamperAttempt(what: "failed code attempt to \(action)")
                     }
 
                     let retry = NSAlert()
-                    retry.messageText = "Wrong password"
+                    retry.messageText = "Wrong code"
                     retry.informativeText = body
                     retry.alertStyle = .critical
                     let retryField = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 260, height: 24))
-                    retryField.placeholderString = "Protection password"
+                    retryField.placeholderString = "XXXX-XXXX"
                     retry.accessoryView = retryField
                     retry.addButton(withTitle: "Try Again")
                     retry.addButton(withTitle: "Cancel")
 
-                    self?.attemptPasswordVerification(alert: retry, field: retryField,
-                                                      action: action, attemptsLeft: remaining,
-                                                      completion: completion)
+                    self?.attemptCodeVerification(alert: retry, field: retryField,
+                                                  action: action, attemptsLeft: remaining,
+                                                  completion: completion)
                 }
             }
         }

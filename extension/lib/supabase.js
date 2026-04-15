@@ -141,12 +141,12 @@ const SUPABASE = (() => {
       return first(rows);
     },
 
-    // Returns all active relationships for the signed-in user, with partner telegram_chat_ids.
+    // Returns all active relationships for the signed-in user, with partner telegram_chat_ids, role, and cooldown.
     async getActiveRelationships() {
       const session = await AUTH.getSession();
       if (!session) return [];
       const rows = await req(
-        `relationships?owner_id=eq.${session.user_id}&status=eq.active&select=id,partner:profiles!partner_id(telegram_chat_id)`
+        `relationships?owner_id=eq.${session.user_id}&status=eq.active&select=id,role,cooldown_until,partner:profiles!partner_id(telegram_chat_id)`
       );
       return rows ?? [];
     },

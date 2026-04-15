@@ -47,13 +47,20 @@ final class XPCListener: NSObject, NSXPCListenerDelegate, YouTubeMinusXPCProtoco
         ])
     }
 
-    func verifyPassword(_ password: String, reply: @escaping (Bool) -> Void) {
-        reply(keychain.verifyPassword(password))
+    func verifyUninstallCode(_ code: String, reply: @escaping (Bool) -> Void) {
+        reply(keychain.verifyUninstallCode(code))
     }
 
-    func setPassword(_ password: String, reply: @escaping (Bool) -> Void) {
-        let ok = keychain.storePassword(password)
-        NSLog("[XPCListener] setPassword: \(ok ? "success" : "failed")")
+    func setUninstallCode(_ code: String, reply: @escaping (Bool) -> Void) {
+        let ok = keychain.storeUninstallCode(code)
+        NSLog("[XPCListener] setUninstallCode: \(ok ? "success" : "failed")")
+        reply(ok)
+    }
+
+    func setPartnerChatIds(_ ids: String, reply: @escaping (Bool) -> Void) {
+        let list = ids.split(separator: "\n").map(String.init).filter { !$0.isEmpty }
+        let ok = keychain.storePartnerChatIds(list)
+        NSLog("[XPCListener] setPartnerChatIds (\(list.count) ids): \(ok ? "success" : "failed")")
         reply(ok)
     }
 

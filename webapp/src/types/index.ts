@@ -11,6 +11,7 @@ export interface Profile {
   subscription_status: SubscriptionStatus
   created_at: string
   telegram_chat_id?: string
+  uninstall_code?: string
 }
 
 export interface Relationship {
@@ -18,10 +19,40 @@ export interface Relationship {
   owner_id: string
   partner_id: string
   status: RelationshipStatus
+  role: 'primary' | 'co_approver'
+  cooldown_until?: string
   created_at: string
   dissolved_at?: string
   owner?: Profile
   partner?: Profile
+}
+
+export type ChangeRequestStatus =
+  | 'pending_primary_approval'
+  | 'primary_approved'
+  | 'pending_invite'
+  | 'completed'
+  | 'denied'
+  | 'cancelled'
+  | 'unlocked'
+
+export type ChangeRequestType = 'add_co_approver' | 'remove_co_approver' | 'remove_primary'
+
+export interface ApproverChangeRequest {
+  id: string
+  owner_id: string
+  type: ChangeRequestType
+  target_email?: string
+  target_relationship_id?: string
+  new_primary_relationship_id?: string
+  primary_relationship_id?: string
+  status: ChangeRequestStatus
+  unlock_at?: string
+  invite_token?: string
+  created_at: string
+  resolved_at?: string
+  // joined
+  target_relationship?: Relationship
 }
 
 export interface Request {

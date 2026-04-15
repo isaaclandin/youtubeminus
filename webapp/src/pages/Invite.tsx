@@ -10,7 +10,7 @@ export function Invite() {
   const { token } = useParams<{ token: string }>()
   const navigate = useNavigate()
   const [step, setStep] = useState<Step>('loading')
-  const [tokenData, setTokenData] = useState<{ owner: Profile; expires_at: string } | null>(null)
+  const [tokenData, setTokenData] = useState<{ owner: Profile; expires_at: string; role: 'primary' | 'co_approver' } | null>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [session, setSession] = useState<{ user: { id: string; email?: string } } | null>(null)
   const [email, setEmail] = useState('')
@@ -53,7 +53,7 @@ export function Invite() {
         setStep('error')
         return
       }
-      setTokenData({ owner: record.owner as Profile, expires_at: record.expires_at })
+      setTokenData({ owner: record.owner as Profile, expires_at: record.expires_at, role: (record.role ?? 'primary') as 'primary' | 'co_approver' })
 
       if (data.session?.user) {
         setSession(data.session as unknown as { user: { id: string; email?: string } })
@@ -152,7 +152,8 @@ export function Invite() {
           <div className="flex flex-col gap-4">
             <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 text-center">
               <p className="text-white font-medium">
-                <span className="text-red-400">{tokenData.owner.display_name}</span> invited you to be their accountability partner.
+                <span className="text-red-400">{tokenData.owner.display_name}</span> invited you to be their{' '}
+                {tokenData.role === 'co_approver' ? 'co-approver' : 'accountability partner'}.
               </p>
               <p className="text-neutral-500 text-xs mt-1">Sign in or create an account to continue.</p>
             </div>
@@ -214,11 +215,14 @@ export function Invite() {
             <div className="text-center">
               <p className="text-white font-medium text-lg">Accept Partnership?</p>
               <p className="text-neutral-400 text-sm mt-1">
-                <span className="text-red-400 font-medium">{tokenData.owner.display_name}</span> wants you to be their accountability partner on YouTubeMinus.
+                <span className="text-red-400 font-medium">{tokenData.owner.display_name}</span> wants you to be their{' '}
+                {tokenData.role === 'co_approver' ? 'co-approver' : 'accountability partner'} on YouTubeMinus.
               </p>
             </div>
             <p className="text-neutral-500 text-xs text-center">
-              You'll review their YouTube watch requests and approve or deny them.
+              {tokenData.role === 'co_approver'
+                ? "You'll help review their YouTube watch requests. As a co-approver, you'll have a 12-hour cooldown before you can approve requests."
+                : "You'll review their YouTube watch requests and approve or deny them."}
             </p>
             <button
               onClick={handleAccept}

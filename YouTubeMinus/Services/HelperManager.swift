@@ -30,12 +30,16 @@ final class HelperManager {
         proxy()?.getStatus(reply: reply) ?? reply([:])
     }
 
-    func verifyPassword(_ password: String, reply: @escaping (Bool) -> Void) {
-        proxy()?.verifyPassword(password, reply: reply) ?? reply(false)
+    func verifyUninstallCode(_ code: String, reply: @escaping (Bool) -> Void) {
+        proxy()?.verifyUninstallCode(code, reply: reply) ?? reply(false)
     }
 
-    func setPassword(_ password: String, reply: @escaping (Bool) -> Void) {
-        proxy()?.setPassword(password, reply: reply) ?? reply(false)
+    func setUninstallCode(_ code: String, reply: @escaping (Bool) -> Void) {
+        proxy()?.setUninstallCode(code, reply: reply) ?? reply(false)
+    }
+
+    func setPartnerChatIds(_ ids: [String], reply: @escaping (Bool) -> Void) {
+        proxy()?.setPartnerChatIds(ids.joined(separator: "\n"), reply: reply) ?? reply(false)
     }
 
     func reportTamperAttempt(what: String) {

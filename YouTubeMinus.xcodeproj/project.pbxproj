@@ -26,6 +26,7 @@
 		B8517DDE3DBD59F4A29DBE26 /* YouTubeMinusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F87397050814B9EE43427F /* YouTubeMinusApp.swift */; };
 		D10460BE3D624954682459F7 /* XPCListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF3A19FD1F8A26736A46961 /* XPCListener.swift */; };
 		D3CA0F93E9A9EC652C168FCB /* HelperInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB5B5A8EB9C63EAEA885B85 /* HelperInstaller.swift */; };
+		E5A1B2C3D4E5F60718293A4B /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2A4B7D8E9F0123456789ABC /* SupabaseClient.swift */; };
 		D8FF3DE228C12B8B410BF6DF /* DNSServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 091C60EECFD021720C344C31 /* DNSServer.swift */; };
 		DA433E4B6C86A74349FB876D /* HelperKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 275AD970F0983CF2B318C272 /* HelperKeychain.swift */; };
 		DCCB11F2472946F9361AA204 /* XPCProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A12280732A7D7FC1C7932F0 /* XPCProtocol.swift */; };
@@ -66,6 +67,7 @@
 		AFCEAF345DCEC77491AC5913 /* ChromeProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromeProxy.swift; sourceTree = "<group>"; };
 		B4E876B934A89A4E0C8F9CB8 /* PFFirewallManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PFFirewallManager.swift; sourceTree = "<group>"; };
 		B51CEEE2BD1351D6047D5E82 /* ChromePolicyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChromePolicyManager.swift; sourceTree = "<group>"; };
+		C2A4B7D8E9F0123456789ABC /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
 		D8CF384118ABE490BFCE987C /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		F8903418D14D2F97DB0C0E69 /* DoHResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoHResolver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -112,6 +114,7 @@
 				8BB5B5A8EB9C63EAEA885B85 /* HelperInstaller.swift */,
 				54C57303D1A9B09CDAE266F1 /* HelperManager.swift */,
 				D8CF384118ABE490BFCE987C /* KeychainHelper.swift */,
+				C2A4B7D8E9F0123456789ABC /* SupabaseClient.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -296,6 +299,7 @@
 				D3CA0F93E9A9EC652C168FCB /* HelperInstaller.swift in Sources */,
 				84088E4055524DB3066FDB64 /* HelperManager.swift in Sources */,
 				B3F796BE548ED7CCA23D2415 /* KeychainHelper.swift in Sources */,
+				E5A1B2C3D4E5F60718293A4B /* SupabaseClient.swift in Sources */,
 				3AD56F9CA227D9F13BD2B4D3 /* MenuBarController.swift in Sources */,
 				6E672BD7F4A8CD1C70E66E70 /* SetupView.swift in Sources */,
 				FF3FB1564402C87D75C390D4 /* StatusPopoverView.swift in Sources */,

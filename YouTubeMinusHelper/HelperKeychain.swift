@@ -4,7 +4,7 @@ import CommonCrypto
 
 /// Reads/writes items in the **system** keychain at
 /// /Library/Keychains/System.keychain — only accessible by root.
-/// This ensures Isaac (a standard user) cannot read or delete the password.
+/// This ensures the device owner cannot read or delete the uninstall code.
 struct HelperKeychain {
 
     private let keychainPath = "/Library/Keychains/System.keychain"
@@ -45,21 +45,34 @@ struct HelperKeychain {
         return String(data: data, encoding: .utf8)
     }
 
-    // MARK: - Password helpers
+    // MARK: - Partner chat ID helpers
 
-    /// Store Jenna's password as a salted SHA-256 hash.
-    func storePassword(_ password: String) -> Bool {
-        let salt = UUID().uuidString
-        guard let hash = sha256(password + salt) else { return false }
-        return save(value: hash, key: Constants.Keychain.passwordHashKey)
-            && save(value: salt, key: Constants.Keychain.passwordSaltKey)
+    /// Store a list of partner Telegram chat IDs (newline-separated).
+    func storePartnerChatIds(_ ids: [String]) -> Bool {
+        save(value: ids.joined(separator: "\n"), key: Constants.Keychain.partnerChatIds)
     }
 
-    /// Returns true if the supplied password matches the stored hash.
-    func verifyPassword(_ password: String) -> Bool {
-        guard let storedHash = load(key: Constants.Keychain.passwordHashKey),
-              let salt       = load(key: Constants.Keychain.passwordSaltKey),
-              let computed   = sha256(password + salt) else { return false }
+    /// Load the stored partner chat IDs. Returns [] if none stored.
+    func loadPartnerChatIds() -> [String] {
+        guard let raw = load(key: Constants.Keychain.partnerChatIds) else { return [] }
+        return raw.split(separator: "\n").map(String.init).filter { !$0.isEmpty }
+    }
+
+    // MARK: - Uninstall code helpers
+
+    /// Store the uninstall code as a salted SHA-256 hash.
+    func storeUninstallCode(_ code: String) -> Bool {
+        let salt = UUID().uuidString
+        guard let hash = sha256(code + salt) else { return false }
+        return save(value: hash, key: Constants.Keychain.uninstallCodeHash)
+            && save(value: salt, key: Constants.Keychain.uninstallCodeSalt)
+    }
+
+    /// Returns true if the supplied code matches the stored hash.
+    func verifyUninstallCode(_ code: String) -> Bool {
+        guard let storedHash = load(key: Constants.Keychain.uninstallCodeHash),
+              let salt       = load(key: Constants.Keychain.uninstallCodeSalt),
+              let computed   = sha256(code + salt) else { return false }
         return computed == storedHash
     }
 

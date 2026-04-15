@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Profile, Relationship, Request, DurationType } from '../types'
+import type { Profile, Relationship, Request, DurationType, ApproverChangeRequest } from '../types'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
@@ -69,6 +69,22 @@ export async function getActivePartners(ownerId: string): Promise<Profile[]> {
 }
 
 // ---- Request helpers ----
+
+export async function getAllRequestsForOwner(relationshipIds: string[], limit = 100): Promise<Request[]> {
+  if (!relationshipIds.length) return []
+  const { data, error } = await supabase
+    .from('requests')
+    .select('*')
+    .in('relationship_id', relationshipIds)
+    .eq('requested_by', 'account_owner')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error) {
+    console.error('getAllRequestsForOwner error:', error)
+    return []
+  }
+  return (data ?? []) as Request[]
+}
 
 export async function getPendingRequestsForOwner(relationshipIds: string[]): Promise<Request[]> {
   if (!relationshipIds.length) return []
@@ -154,11 +170,11 @@ export async function getActiveGrantedByPartner(relationshipIds: string[]): Prom
 
 function calcExpiresAt(durationType: DurationType): string {
   const now = Date.now()
-  const map = {
+  const map: Record<DurationType, number> = {
     '1_day':  now + 24 * 3600_000,
     '1_week': now + 7 * 24 * 3600_000,
   }
-  return new Date(map[durationType]).toISOString()
+  return new Date(map[durationType] ?? now + 24 * 3600_000).toISOString()
 }
 
 export async function approveRequest(requestId: string, durationType: DurationType): Promise<Request | null> {
@@ -261,6 +277,32 @@ export async function createInviteToken(ownerId: string): Promise<string | null>
   return token
 }
 
+export async function createCoApproverInviteToken(
+  ownerId: string,
+  changeRequestId: string,
+): Promise<string | null> {
+  const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '')
+  const expiresAt = new Date(Date.now() + 7 * 24 * 3600_000).toISOString()
+  const { error } = await supabase.from('invite_tokens').insert({
+    owner_id: ownerId,
+    token,
+    used: false,
+    expires_at: expiresAt,
+    role: 'co_approver',
+    change_request_id: changeRequestId,
+  })
+  if (error) {
+    console.error('createCoApproverInviteToken error:', error)
+    return null
+  }
+  // Store token on the change request so owner can retrieve it
+  await supabase
+    .from('approver_change_requests')
+    .update({ status: 'pending_invite', invite_token: token })
+    .eq('id', changeRequestId)
+  return token
+}
+
 export async function getInviteToken(token: string) {
   const { data, error } = await supabase
     .from('invite_tokens')
@@ -279,12 +321,21 @@ export async function acceptInvite(token: string, partnerId: string): Promise<bo
   if (new Date(tokenRecord.expires_at) < new Date()) return false
   if (tokenRecord.owner_id === partnerId) return false  // can't be your own partner
 
+  const role = tokenRecord.role ?? 'primary'
+  const cooldownUntil = role === 'co_approver'
+    ? new Date(Date.now() + 12 * 3600_000).toISOString()
+    : undefined
+
   // Create relationship
-  const { error: relError } = await supabase.from('relationships').insert({
+  const relData: Record<string, unknown> = {
     owner_id: tokenRecord.owner_id,
     partner_id: partnerId,
     status: 'active',
-  })
+    role,
+  }
+  if (cooldownUntil) relData.cooldown_until = cooldownUntil
+
+  const { error: relError } = await supabase.from('relationships').insert(relData)
   if (relError) {
     console.error('acceptInvite relationship error:', relError)
     return false
@@ -292,7 +343,25 @@ export async function acceptInvite(token: string, partnerId: string): Promise<bo
 
   // Mark token as used
   await supabase.from('invite_tokens').update({ used: true }).eq('id', tokenRecord.id)
+
+  // If this was a co-approver invite from a change request, mark it completed
+  if (tokenRecord.change_request_id) {
+    await supabase
+      .from('approver_change_requests')
+      .update({ status: 'completed', resolved_at: new Date().toISOString() })
+      .eq('id', tokenRecord.change_request_id)
+  }
+
   return true
+}
+
+export async function getInviteTokenRole(token: string): Promise<'primary' | 'co_approver'> {
+  const { data } = await supabase
+    .from('invite_tokens')
+    .select('role')
+    .eq('token', token)
+    .single()
+  return (data?.role ?? 'primary') as 'primary' | 'co_approver'
 }
 
 // ---- Telegram link codes ----
@@ -346,6 +415,178 @@ export async function sendInvite(
   if (!res.ok) return { ok: false, error: json.error ?? 'Failed to send invite' }
   return { ok: true, method: json.method }
 }
+
+// ---- Approver change requests ----
+
+export async function getChangeRequestsForOwner(ownerId: string): Promise<ApproverChangeRequest[]> {
+  const { data, error } = await supabase
+    .from('approver_change_requests')
+    .select('*, target_relationship:relationships!target_relationship_id(*, owner:profiles!owner_id(*), partner:profiles!partner_id(*))')
+    .eq('owner_id', ownerId)
+    .order('created_at', { ascending: false })
+  if (error) {
+    console.error('getChangeRequestsForOwner error:', error)
+    return []
+  }
+  return (data ?? []) as ApproverChangeRequest[]
+}
+
+export async function getPendingChangeRequestsForPrimary(partnerRelationshipIds: string[]): Promise<ApproverChangeRequest[]> {
+  if (!partnerRelationshipIds.length) return []
+  const { data, error } = await supabase
+    .from('approver_change_requests')
+    .select('*, target_relationship:relationships!target_relationship_id(*, owner:profiles!owner_id(*), partner:profiles!partner_id(*))')
+    .in('primary_relationship_id', partnerRelationshipIds)
+    .in('status', ['pending_primary_approval'])
+    .order('created_at', { ascending: false })
+  if (error) {
+    console.error('getPendingChangeRequestsForPrimary error:', error)
+    return []
+  }
+  return (data ?? []) as ApproverChangeRequest[]
+}
+
+export async function proposeAddCoApprover(
+  ownerId: string,
+  targetEmail: string,
+  primaryRelationshipId: string,
+): Promise<ApproverChangeRequest | null> {
+  const { data, error } = await supabase
+    .from('approver_change_requests')
+    .insert({
+      owner_id: ownerId,
+      type: 'add_co_approver',
+      target_email: targetEmail,
+      primary_relationship_id: primaryRelationshipId,
+      status: 'pending_primary_approval',
+    })
+    .select()
+    .single()
+  if (error) {
+    console.error('proposeAddCoApprover error:', error)
+    return null
+  }
+  return data as ApproverChangeRequest
+}
+
+export async function proposeRemoveCoApprover(
+  ownerId: string,
+  targetRelationshipId: string,
+  primaryRelationshipId: string,
+): Promise<ApproverChangeRequest | null> {
+  const { data, error } = await supabase
+    .from('approver_change_requests')
+    .insert({
+      owner_id: ownerId,
+      type: 'remove_co_approver',
+      target_relationship_id: targetRelationshipId,
+      primary_relationship_id: primaryRelationshipId,
+      status: 'pending_primary_approval',
+    })
+    .select()
+    .single()
+  if (error) {
+    console.error('proposeRemoveCoApprover error:', error)
+    return null
+  }
+  return data as ApproverChangeRequest
+}
+
+export async function requestPrimaryRemoval(ownerId: string, primaryRelationshipId: string): Promise<ApproverChangeRequest | null> {
+  const unlockAt = new Date(Date.now() + 48 * 3600_000).toISOString()
+  const { data, error } = await supabase
+    .from('approver_change_requests')
+    .insert({
+      owner_id: ownerId,
+      type: 'remove_primary',
+      primary_relationship_id: primaryRelationshipId,
+      status: 'pending_primary_approval',
+      unlock_at: unlockAt,
+    })
+    .select()
+    .single()
+  if (error) {
+    console.error('requestPrimaryRemoval error:', error)
+    return null
+  }
+  return data as ApproverChangeRequest
+}
+
+export async function approveChangeRequest(
+  requestId: string,
+  inviteToken?: string,
+): Promise<ApproverChangeRequest | null> {
+  const update: Record<string, unknown> = { status: 'primary_approved' }
+  if (inviteToken) {
+    update.status = 'pending_invite'
+    update.invite_token = inviteToken
+  }
+  const { data, error } = await supabase
+    .from('approver_change_requests')
+    .update(update)
+    .eq('id', requestId)
+    .select()
+    .single()
+  if (error) {
+    console.error('approveChangeRequest error:', error)
+    return null
+  }
+  return data as ApproverChangeRequest
+}
+
+export async function denyChangeRequest(requestId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('approver_change_requests')
+    .update({ status: 'denied', resolved_at: new Date().toISOString() })
+    .eq('id', requestId)
+  if (error) {
+    console.error('denyChangeRequest error:', error)
+    return false
+  }
+  return true
+}
+
+export async function cancelChangeRequest(requestId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('approver_change_requests')
+    .update({ status: 'cancelled', resolved_at: new Date().toISOString() })
+    .eq('id', requestId)
+  if (error) {
+    console.error('cancelChangeRequest error:', error)
+    return false
+  }
+  return true
+}
+
+export async function confirmPrimaryRemoval(
+  requestId: string,
+  newPrimaryRelationshipId: string,
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('approver_change_requests')
+    .update({
+      status: 'completed',
+      new_primary_relationship_id: newPrimaryRelationshipId,
+      resolved_at: new Date().toISOString(),
+    })
+    .eq('id', requestId)
+  if (error) {
+    console.error('confirmPrimaryRemoval error:', error)
+    return false
+  }
+  // Promote the chosen co-approver to primary
+  const { error: relError } = await supabase
+    .from('relationships')
+    .update({ role: 'primary' })
+    .eq('id', newPrimaryRelationshipId)
+  if (relError) {
+    console.error('confirmPrimaryRemoval promote error:', relError)
+    return false
+  }
+  return true
+}
+
+// ---- Relationship helpers (extended) ----
 
 export async function dissolveRelationship(relationshipId: string): Promise<boolean> {
   const { error } = await supabase

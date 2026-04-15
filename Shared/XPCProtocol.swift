@@ -12,13 +12,17 @@ protocol YouTubeMinusXPCProtocol {
     ///   "tamperCount"     Int    — times a tamper was detected this session
     func getStatus(reply: @escaping ([String: Any]) -> Void)
 
-    /// Verify Jenna's protection password.
+    /// Verify the uninstall code.
     /// The helper compares the hash stored in /Library/… against the
-    /// SHA-256+salt hash of the supplied password.
-    func verifyPassword(_ password: String, reply: @escaping (Bool) -> Void)
+    /// SHA-256+salt hash of the supplied code.
+    func verifyUninstallCode(_ code: String, reply: @escaping (Bool) -> Void)
 
-    /// Called once during first-run setup to persist the password hash.
-    func setPassword(_ password: String, reply: @escaping (Bool) -> Void)
+    /// Called once during first-run setup to persist the uninstall code hash.
+    func setUninstallCode(_ code: String, reply: @escaping (Bool) -> Void)
+
+    /// Store partner Telegram chat IDs (newline-separated) for tamper alerts.
+    /// Called during setup and whenever the partner list changes.
+    func setPartnerChatIds(_ ids: String, reply: @escaping (Bool) -> Void)
 
     /// Force an immediate tamper-check cycle (used by the app after detecting
     /// something suspicious on the user side).

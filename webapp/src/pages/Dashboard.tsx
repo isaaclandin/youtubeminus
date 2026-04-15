@@ -373,6 +373,25 @@ export function Dashboard() {
                 })}
               </div>
 
+              {/* Selected owner's uninstall code */}
+              {selectedRel && selectedRel.owner?.uninstall_code && (
+                <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-neutral-400 text-xs mb-1">Uninstall code for {ownerNames[selectedRel.id] || 'this user'}</p>
+                    <p className="text-white font-mono font-semibold tracking-widest">{selectedRel.owner.uninstall_code}</p>
+                  </div>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(selectedRel.owner!.uninstall_code!)}
+                    className="text-neutral-500 hover:text-white transition-colors flex-shrink-0"
+                    title="Copy to clipboard"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+
               {/* Selected owner's requests */}
               {selectedRel && (
                 <div className="flex flex-col gap-4">

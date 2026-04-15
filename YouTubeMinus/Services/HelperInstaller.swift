@@ -18,7 +18,12 @@ final class HelperInstaller {
 
     // MARK: - Install
 
-    func install(password: String,
+    /// Installs the daemon and stores a randomly-generated uninstall code in:
+    ///   1. The system keychain (root-only, for local verification)
+    ///   2. The user's Supabase profile (plaintext, visible to partners on the dashboard)
+    ///
+    /// The caller never receives the plaintext code — it goes straight to the partner dashboard.
+    func install(accessToken: String, userId: String,
                  completion: @escaping (Result<Void, Error>) -> Void) {
 
         guard let helperSrc = helperBinaryPath,
@@ -54,21 +59,49 @@ final class HelperInstaller {
             return
         }
 
-        // Wait up to 5 s for helper to appear, then send initial config via XPC.
+        let code = Self.generateUninstallCode()
+
+        // Wait up to 5 s for helper to appear, then store the code via XPC.
         waitForHelper(timeout: 5) { [weak self] available in
             guard available else {
                 completion(.failure(InstallerError.helperDidNotStart))
                 return
             }
-            self?.configureHelper(password: password, completion: completion)
+            self?.storeCodeLocally(code) { result in
+                switch result {
+                case .failure(let err):
+                    completion(.failure(err))
+                case .success:
+                    Task {
+                        do {
+                            // Push plaintext code to partner dashboard
+                            try await SupabaseClient.storeUninstallCode(code, userId: userId,
+                                                                         accessToken: accessToken)
+
+                            // Cache partner chat IDs in system keychain for tamper alerts
+                            let chatIds = try await SupabaseClient.fetchPartnerChatIds(
+                                userId: userId, accessToken: accessToken)
+                            if !chatIds.isEmpty {
+                                HelperManager.shared.setPartnerChatIds(chatIds) { ok in
+                                    NSLog("[HelperInstaller] cached \(chatIds.count) partner chat ID(s): \(ok)")
+                                }
+                            }
+
+                            completion(.success(()))
+                        } catch {
+                            completion(.failure(error))
+                        }
+                    }
+                }
+            }
         }
     }
 
     // MARK: - Private
 
-    private func configureHelper(password: String,
-                                  completion: @escaping (Result<Void, Error>) -> Void) {
-        HelperManager.shared.setPassword(password) { ok in
+    private func storeCodeLocally(_ code: String,
+                                   completion: @escaping (Result<Void, Error>) -> Void) {
+        HelperManager.shared.setUninstallCode(code) { ok in
             if ok {
                 completion(.success(()))
             } else {
@@ -107,6 +140,18 @@ final class HelperInstaller {
         ?? Bundle.main.bundlePath + "/Contents/LaunchDaemons/com.youtubeminus.helper.plist"
     }
 
+    /// Generates a random 8-character code formatted as XXXX-XXXX.
+    /// Uses uppercase letters and digits, excluding visually ambiguous chars (0, O, I, 1).
+    static func generateUninstallCode() -> String {
+        let charset = Array("ABCDEFGHJKLMNPQRSTUVWXYZ23456789")
+        var result = ""
+        for i in 0..<8 {
+            if i == 4 { result += "-" }
+            result += String(charset[Int.random(in: 0..<charset.count)])
+        }
+        return result
+    }
+
     // MARK: - Errors
 
     enum InstallerError: LocalizedError {
@@ -120,7 +165,7 @@ final class HelperInstaller {
             case .bundleResourceMissing: return "Helper binary or plist not found in app bundle."
             case .applescriptFailed(let m): return m
             case .helperDidNotStart: return "Daemon started but did not respond in time."
-            case .xpcSetupFailed: return "Could not configure helper over XPC."
+            case .xpcSetupFailed: return "Could not store uninstall code in helper."
             }
         }
     }

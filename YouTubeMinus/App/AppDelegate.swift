@@ -22,7 +22,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         // Intercept quit. Ask for Jenna's password before allowing it.
-        menuBarController?.requestPasswordForAction(action: "quit the app") { granted in
+        menuBarController?.requestUninstallCodeForAction(action: "quit the app") { granted in
             if granted {
                 NSApplication.shared.reply(toApplicationShouldTerminate: true)
             }

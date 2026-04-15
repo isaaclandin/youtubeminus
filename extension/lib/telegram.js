@@ -10,13 +10,18 @@ const TELEGRAM = (() => {
     }).then(r => { if (!r.ok) r.text().then(t => console.error('[TELEGRAM]', method, t)); });
   }
 
-  // ── Partner: Isaac submitted a request ──────────────────────────────────────
-  async function notifyJennaRequest({ chatId, requestId, videoTitle, videoThumbnail, reason }) {
+  // ── Partner: owner submitted a request ──────────────────────────────────────
+  // escalation=false  → send only to primary
+  // escalation=true   → send to all partners (15-min timer expired)
+  async function notifyPartnerRequest({ chatId, requestId, videoTitle, videoThumbnail, reason, escalation }) {
     if (!chatId) return;
 
+    const prefix = escalation
+      ? '⏰ *Escalation: still waiting for approval*\n\n'
+      : '🎬 *New video request*\n\n';
+
     const caption =
-      `🎬 *Isaac wants to watch a video*\n\n` +
-      `*${videoTitle}*\n\n` +
+      `${prefix}*${videoTitle}*\n\n` +
       `_${reason}_`;
 
     const reply_markup = {
@@ -31,7 +36,6 @@ const TELEGRAM = (() => {
       ],
     };
 
-    // Send thumbnail as photo with caption + buttons
     if (videoThumbnail) {
       return api('sendPhoto', {
         chat_id:      chatId,
@@ -42,7 +46,6 @@ const TELEGRAM = (() => {
       });
     }
 
-    // Fallback: text only
     return api('sendMessage', {
       chat_id:      chatId,
       text:         caption,
@@ -51,38 +54,55 @@ const TELEGRAM = (() => {
     });
   }
 
-  // ── Isaac: request approved ──────────────────────────────────────────────────
-  async function notifyIsaacApproved({ videoTitle, durationLabel, expiresAt }) {
+  // ── Owner: request approved ──────────────────────────────────────────────────
+  async function notifyOwnerApproved({ ownerChatId, videoTitle, durationLabel, expiresAt }) {
+    if (!ownerChatId) return;
     const expiry = new Date(expiresAt).toLocaleString('en-US', {
       weekday: 'short', month: 'short', day: 'numeric',
       hour: 'numeric', minute: '2-digit',
     });
     return api('sendMessage', {
-      chat_id:    YTM_CONFIG.isaacChatId,
+      chat_id:    ownerChatId,
       text:       `✅ *Request approved*\n\n*${videoTitle}*\nDuration: ${durationLabel}\nExpires: ${expiry}`,
       parse_mode: 'Markdown',
     });
   }
 
-  // ── Isaac: request denied ────────────────────────────────────────────────────
-  async function notifyIsaacDenied({ videoTitle }) {
+  // ── Owner: request denied ────────────────────────────────────────────────────
+  async function notifyOwnerDenied({ ownerChatId, videoTitle }) {
+    if (!ownerChatId) return;
     return api('sendMessage', {
-      chat_id:    YTM_CONFIG.isaacChatId,
+      chat_id:    ownerChatId,
       text:       `🚫 *Request denied*\n\n*${videoTitle}*`,
       parse_mode: 'Markdown',
     });
   }
 
-  // ── Isaac: 15-minute expiry warning ─────────────────────────────────────────
-  async function notifyIsaacExpiryWarning({ videoTitle }) {
+  // ── Owner: 15-minute expiry warning ─────────────────────────────────────────
+  async function notifyOwnerExpiryWarning({ ownerChatId, videoTitle }) {
+    if (!ownerChatId) return;
     return api('sendMessage', {
-      chat_id:    YTM_CONFIG.isaacChatId,
+      chat_id:    ownerChatId,
       text:       `⏳ *15 minutes remaining*\n\n*${videoTitle}*`,
       parse_mode: 'Markdown',
     });
   }
 
+  // Deprecated aliases — kept for backward compat with background.js
+  const notifyJennaRequest    = (args) => notifyPartnerRequest(args);
+  const notifyIsaacApproved   = ({ videoTitle, durationLabel, expiresAt }) =>
+    notifyOwnerApproved({ ownerChatId: YTM_CONFIG.isaacChatId, videoTitle, durationLabel, expiresAt });
+  const notifyIsaacDenied     = ({ videoTitle }) =>
+    notifyOwnerDenied({ ownerChatId: YTM_CONFIG.isaacChatId, videoTitle });
+  const notifyIsaacExpiryWarning = ({ videoTitle }) =>
+    notifyOwnerExpiryWarning({ ownerChatId: YTM_CONFIG.isaacChatId, videoTitle });
+
   return {
+    notifyPartnerRequest,
+    notifyOwnerApproved,
+    notifyOwnerDenied,
+    notifyOwnerExpiryWarning,
+    // Legacy
     notifyJennaRequest,
     notifyIsaacApproved,
     notifyIsaacDenied,
