@@ -19,6 +19,6 @@ const YTM_CONFIG = {
   // Base URL of the approval dashboard — used in email deep links.
   // Open dashboard/index.html locally or host it anywhere (GitHub Pages, etc.)
   // then paste the URL here.
-  dashboardUrl: 'DASHBOARD_URL_HERE',   // ← fill in after hosting dashboard/
+  dashboardUrl: 'https://isaaclandin.github.io/youtubeminus/dashboard',
 };
 // ─────────────────────────────────────────────────────────────────────────────
