@@ -76,9 +76,9 @@ enum Constants {
         static let resendKeyKey     = "resend-api-key"
     }
 
-    // ── Fill these in ────────────────────────────────────────────────────────
-    static let resendAPIKey   = "RESEND_API_KEY_HERE"
-    static let resendFromAddr = "alerts@yourdomain.com"
-    static let dashboardURL   = "https://your-dashboard.vercel.app"
-    // ────────────────────────────────────────────────────────────────────────
+    // ── Telegram (tamper alerts from the macOS helper) ───────────────────────
+    static let telegramBotToken = "8736854276:AAEt6MCpPyenNX3Hda5St-uLTvIo33kLs-A"
+    static let jennaChatId      = "6770280815" // temp: Isaac's ID until Jenna sets up Telegram
+    static let isaacChatId      = "6770280815"
+    // ─────────────────────────────────────────────────────────────────────────
 }

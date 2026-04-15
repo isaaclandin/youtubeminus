@@ -18,7 +18,7 @@ final class HelperInstaller {
 
     // MARK: - Install
 
-    func install(jennaEmail: String, password: String, resendKey: String,
+    func install(password: String,
                  completion: @escaping (Result<Void, Error>) -> Void) {
 
         guard let helperSrc = helperBinaryPath,
@@ -60,17 +60,15 @@ final class HelperInstaller {
                 completion(.failure(InstallerError.helperDidNotStart))
                 return
             }
-            self?.configureHelper(jennaEmail: jennaEmail, password: password,
-                                  resendKey: resendKey, completion: completion)
+            self?.configureHelper(password: password, completion: completion)
         }
     }
 
     // MARK: - Private
 
-    private func configureHelper(jennaEmail: String, password: String, resendKey: String,
+    private func configureHelper(password: String,
                                   completion: @escaping (Result<Void, Error>) -> Void) {
-        HelperManager.shared.setPassword(password, jennaEmail: jennaEmail,
-                                         resendKey: resendKey) { ok in
+        HelperManager.shared.setPassword(password) { ok in
             if ok {
                 completion(.success(()))
             } else {

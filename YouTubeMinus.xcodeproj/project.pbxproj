@@ -13,7 +13,6 @@
 		2C1DFAE22BB9187DD380284C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7518411F45D4B19F8894243D /* AppDelegate.swift */; };
 		3AD56F9CA227D9F13BD2B4D3 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 95F74A337406BF1DEC260DF3 /* MenuBarController.swift */; };
 		3C607E5A2F8B8960B7009B33 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 900D2104009519786CB72277 /* main.swift */; };
-		48DD309808EFFCFE9C9CB122 /* ResendClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6D41510C61BB7708EDEBBF /* ResendClient.swift */; };
 		6E672BD7F4A8CD1C70E66E70 /* SetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9856B0A8A7FED5312BD423D1 /* SetupView.swift */; };
 		7DC1D38C0195484241BA8328 /* SignatureVerifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C9A54CB840010839A22A1F6 /* SignatureVerifier.swift */; };
 		84088E4055524DB3066FDB64 /* HelperManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C57303D1A9B09CDAE266F1 /* HelperManager.swift */; };
@@ -58,7 +57,6 @@
 		656112D91F6830F620F04D93 /* YouTubeMinusHelper */ = {isa = PBXFileReference; includeInIndex = 0; path = YouTubeMinusHelper; sourceTree = BUILT_PRODUCTS_DIR; };
 		7518411F45D4B19F8894243D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7C9A54CB840010839A22A1F6 /* SignatureVerifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignatureVerifier.swift; sourceTree = "<group>"; };
-		7F6D41510C61BB7708EDEBBF /* ResendClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResendClient.swift; sourceTree = "<group>"; };
 		8465E35071ADCAC98E6CB57A /* AlertMailer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertMailer.swift; sourceTree = "<group>"; };
 		8AF3A19FD1F8A26736A46961 /* XPCListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XPCListener.swift; sourceTree = "<group>"; };
 		8BB5B5A8EB9C63EAEA885B85 /* HelperInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperInstaller.swift; sourceTree = "<group>"; };
@@ -114,7 +112,6 @@
 				8BB5B5A8EB9C63EAEA885B85 /* HelperInstaller.swift */,
 				54C57303D1A9B09CDAE266F1 /* HelperManager.swift */,
 				D8CF384118ABE490BFCE987C /* KeychainHelper.swift */,
-				7F6D41510C61BB7708EDEBBF /* ResendClient.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -300,7 +297,6 @@
 				84088E4055524DB3066FDB64 /* HelperManager.swift in Sources */,
 				B3F796BE548ED7CCA23D2415 /* KeychainHelper.swift in Sources */,
 				3AD56F9CA227D9F13BD2B4D3 /* MenuBarController.swift in Sources */,
-				48DD309808EFFCFE9C9CB122 /* ResendClient.swift in Sources */,
 				6E672BD7F4A8CD1C70E66E70 /* SetupView.swift in Sources */,
 				FF3FB1564402C87D75C390D4 /* StatusPopoverView.swift in Sources */,
 				DCCB11F2472946F9361AA204 /* XPCProtocol.swift in Sources */,

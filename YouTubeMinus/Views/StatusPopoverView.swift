@@ -99,7 +99,7 @@ struct StatusPopoverView: View {
 
     private func openDashboard() {
         menuBarController?.closePopover()
-        if let url = URL(string: Constants.dashboardURL) {
+        if let url = URL(string: "https://isaaclandin.github.io/youtubeminus/dashboard") {
             NSWorkspace.shared.open(url)
         }
     }

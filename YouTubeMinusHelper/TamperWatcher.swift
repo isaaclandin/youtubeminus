@@ -75,12 +75,6 @@ final class TamperWatcher {
     // MARK: - Alert
 
     private func sendAlert(what: String) {
-        let keychain = HelperKeychain()
-        guard let jennaEmail = keychain.load(key: Constants.Keychain.jennaEmailKey),
-              let resendKey  = keychain.load(key: Constants.Keychain.resendKeyKey) else {
-            NSLog("[TamperWatcher] Cannot send alert — credentials not yet configured.")
-            return
-        }
-        AlertMailer.send(what: what, to: jennaEmail, resendKey: resendKey)
+        AlertMailer.send(what: what)
     }
 }

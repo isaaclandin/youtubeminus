@@ -15,7 +15,7 @@
     "https://*.youtube.com/*",
     "https://youtu.be/*",
     "https://*.supabase.co/*",
-    "https://api.resend.com/*"
+    "https://api.telegram.org/*"
   ],
 
   "background": {
@@ -29,7 +29,6 @@
         "lib/config.js",
         "lib/supabase.js",
         "lib/youtube.js",
-        "lib/resend.js",
         "overlay.js",
         "content.js"
       ],

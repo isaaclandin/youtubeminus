@@ -1,9 +1,66 @@
 // YouTubeMinus — popup script
 // Renders active approvals (with live countdown), pending requests, and history.
-// Polls Supabase every 30 seconds for updates.
+// Shows sign-in form when not authenticated.
 
 (async function () {
   'use strict';
+
+  // ── Auth screens ─────────────────────────────────────────────────────────────
+
+  const screenAuth  = document.getElementById('screen-auth');
+  const screenMain  = document.getElementById('screen-main');
+  const authEmail   = document.getElementById('auth-email');
+  const authPwd     = document.getElementById('auth-password');
+  const authError   = document.getElementById('auth-error');
+  const authSubmit  = document.getElementById('auth-submit');
+  const userEmailEl = document.getElementById('user-email');
+  const signOutBtn  = document.getElementById('sign-out-btn');
+
+  const session = await AUTH.getSession();
+  if (session) {
+    showMain(session);
+  } else {
+    showAuth();
+  }
+
+  authSubmit.addEventListener('click', async () => {
+    const email = authEmail.value.trim();
+    const pwd   = authPwd.value;
+    if (!email || !pwd) return;
+    authSubmit.disabled = true;
+    authSubmit.textContent = 'Signing in…';
+    authError.classList.add('hidden');
+    try {
+      const s = await AUTH.signIn(email, pwd);
+      showMain(s);
+    } catch (e) {
+      authError.textContent = e.message || 'Sign in failed.';
+      authError.classList.remove('hidden');
+      authSubmit.disabled = false;
+      authSubmit.textContent = 'Sign In';
+    }
+  });
+
+  // Allow pressing Enter in the password field to submit
+  authPwd.addEventListener('keydown', e => { if (e.key === 'Enter') authSubmit.click(); });
+
+  signOutBtn.addEventListener('click', async () => {
+    await AUTH.signOut();
+    showAuth();
+  });
+
+  function showAuth() {
+    screenMain.classList.add('hidden');
+    screenAuth.classList.remove('hidden');
+  }
+
+  function showMain(s) {
+    userEmailEl.textContent = s.email || '';
+    screenAuth.classList.add('hidden');
+    screenMain.classList.remove('hidden');
+    render();
+    setInterval(render, 30_000);
+  }
 
   // ── Elements ────────────────────────────────────────────────────────────────
 

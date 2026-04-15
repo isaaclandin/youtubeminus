@@ -9,35 +9,57 @@
 <body>
   <div id="app">
 
-    <header>
-      <span class="logo">🔒</span>
-      <span class="logo-text">YouTubeMinus</span>
-    </header>
+    <!-- Sign-in screen (shown when not logged in) -->
+    <div id="screen-auth" class="hidden">
+      <header>
+        <span class="logo">🔒</span>
+        <span class="logo-text">YouTubeMinus</span>
+      </header>
+      <div class="auth-form">
+        <p class="auth-hint">Sign in with your YouTubeMinus account to activate accountability.</p>
+        <input id="auth-email"    type="email"    placeholder="Email"    autocomplete="email" />
+        <input id="auth-password" type="password" placeholder="Password" autocomplete="current-password" />
+        <p id="auth-error" class="auth-error hidden"></p>
+        <button id="auth-submit">Sign In</button>
+      </div>
+    </div>
 
-    <!-- Active Approvals -->
-    <section id="section-active">
-      <h2 class="section-title">Active</h2>
-      <div id="active-list"></div>
-      <p id="active-empty" class="empty-msg hidden">No active approvals</p>
-    </section>
+    <!-- Main dashboard (shown when logged in) -->
+    <div id="screen-main" class="hidden">
+      <header>
+        <span class="logo">🔒</span>
+        <span class="logo-text">YouTubeMinus</span>
+        <div class="header-right">
+          <span id="user-email" class="user-email"></span>
+          <button id="sign-out-btn" class="sign-out-btn">Sign out</button>
+        </div>
+      </header>
 
-    <div class="divider"></div>
+      <!-- Active Approvals -->
+      <section id="section-active">
+        <h2 class="section-title">Active</h2>
+        <div id="active-list"></div>
+        <p id="active-empty" class="empty-msg hidden">No active approvals</p>
+      </section>
 
-    <!-- Pending Requests -->
-    <section id="section-pending">
-      <h2 class="section-title">Pending</h2>
-      <div id="pending-list"></div>
-      <p id="pending-empty" class="empty-msg hidden">No pending requests</p>
-    </section>
+      <div class="divider"></div>
 
-    <div class="divider"></div>
+      <!-- Pending Requests -->
+      <section id="section-pending">
+        <h2 class="section-title">Pending</h2>
+        <div id="pending-list"></div>
+        <p id="pending-empty" class="empty-msg hidden">No pending requests</p>
+      </section>
 
-    <!-- History -->
-    <section id="section-history">
-      <h2 class="section-title">History</h2>
-      <div id="history-list"></div>
-      <p id="history-empty" class="empty-msg hidden">No history yet</p>
-    </section>
+      <div class="divider"></div>
+
+      <!-- History -->
+      <section id="section-history">
+        <h2 class="section-title">History</h2>
+        <div id="history-list"></div>
+        <p id="history-empty" class="empty-msg hidden">No history yet</p>
+      </section>
+    </div>
 
   </div>
 

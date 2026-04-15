@@ -1,11 +1,90 @@
 // Thin Supabase REST API wrapper — no npm package, no bundler needed.
 // Uses YTM_CONFIG defined in config.js (loaded first).
 
+// ── Auth ─────────────────────────────────────────────────────────────────────
+// Handles sign-in / sign-out / session refresh via chrome.storage.local.
+
+const AUTH = (() => {
+  const KEY = 'ytm_session';
+
+  function load() {
+    return new Promise(resolve =>
+      chrome.storage.local.get(KEY, r => resolve(r[KEY] || null))
+    );
+  }
+  function save(session) {
+    return new Promise(resolve => chrome.storage.local.set({ [KEY]: session }, resolve));
+  }
+  function wipe() {
+    return new Promise(resolve => chrome.storage.local.remove(KEY, resolve));
+  }
+
+  async function callAuth(path, body, token) {
+    const headers = { 'apikey': YTM_CONFIG.supabaseKey, 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const res = await fetch(`${YTM_CONFIG.supabaseUrl}/auth/v1/${path}`, {
+      method: 'POST', headers, body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || data.message || 'Auth error');
+    return data;
+  }
+
+  function parseSession(data) {
+    return {
+      access_token:  data.access_token,
+      refresh_token: data.refresh_token,
+      expires_at:    data.expires_at,   // unix seconds
+      user_id:       data.user.id,
+      email:         data.user.email,
+    };
+  }
+
+  return {
+    async getSession() {
+      const s = await load();
+      if (!s) return null;
+      // Refresh if within 60 s of expiry
+      if (s.expires_at && Date.now() / 1000 > s.expires_at - 60) {
+        try {
+          const data = await callAuth('token?grant_type=refresh_token', { refresh_token: s.refresh_token });
+          const fresh = parseSession(data);
+          await save(fresh);
+          return fresh;
+        } catch {
+          await wipe();
+          return null;
+        }
+      }
+      return s;
+    },
+
+    async signIn(email, password) {
+      const data = await callAuth('token?grant_type=password', { email, password });
+      const session = parseSession(data);
+      await save(session);
+      return session;
+    },
+
+    async signOut() {
+      const s = await load();
+      if (s?.access_token) {
+        await callAuth('logout', {}, s.access_token).catch(() => {});
+      }
+      await wipe();
+    },
+  };
+})();
+
+// ── Supabase REST ─────────────────────────────────────────────────────────────
+
 const SUPABASE = (() => {
-  function headers(extras = {}) {
+  async function headers(extras = {}) {
+    const session = await AUTH.getSession();
+    const token = session?.access_token || YTM_CONFIG.supabaseKey;
     return {
       'apikey':        YTM_CONFIG.supabaseKey,
-      'Authorization': `Bearer ${YTM_CONFIG.supabaseKey}`,
+      'Authorization': `Bearer ${token}`,
       'Content-Type':  'application/json',
       'Prefer':        'return=representation',
       ...extras,
@@ -15,7 +94,7 @@ const SUPABASE = (() => {
   async function req(path, opts = {}) {
     try {
       const res = await fetch(`${YTM_CONFIG.supabaseUrl}/rest/v1/${path}`, {
-        headers: headers(opts.headers),
+        headers: await headers(opts.headers),
         ...opts,
       });
       if (!res.ok) {
@@ -62,8 +141,18 @@ const SUPABASE = (() => {
       return first(rows);
     },
 
+    // Returns all active relationships for the signed-in user, with partner telegram_chat_ids.
+    async getActiveRelationships() {
+      const session = await AUTH.getSession();
+      if (!session) return [];
+      const rows = await req(
+        `relationships?owner_id=eq.${session.user_id}&status=eq.active&select=id,partner:profiles!partner_id(telegram_chat_id)`
+      );
+      return rows ?? [];
+    },
+
     // Create a new pending request. Returns the created row.
-    async createRequest({ videoId, videoTitle, videoThumbnail, reason }) {
+    async createRequest({ videoId, videoTitle, videoThumbnail, reason, relationshipId }) {
       const rows = await req('requests', {
         method: 'POST',
         body: JSON.stringify({
@@ -71,6 +160,8 @@ const SUPABASE = (() => {
           video_title:     videoTitle,
           video_thumbnail: videoThumbnail,
           reason:          reason,
+          relationship_id: relationshipId,
+          requested_by:    'account_owner',
           status:          'pending',
         }),
       });
@@ -106,8 +197,7 @@ const SUPABASE = (() => {
       ) ?? [];
     },
 
-    // Approvals that became active in the last hour — used by background poller
-    // to detect newly-approved requests and fire browser notifications.
+    // Approvals that became active in the last hour — used by background poller.
     async getRecentlyApproved() {
       const hourAgo = new Date(Date.now() - 3_600_000).toISOString();
       const now     = new Date().toISOString();

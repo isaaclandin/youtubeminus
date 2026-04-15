@@ -34,10 +34,8 @@ final class HelperManager {
         proxy()?.verifyPassword(password, reply: reply) ?? reply(false)
     }
 
-    func setPassword(_ password: String, jennaEmail: String,
-                     resendKey: String, reply: @escaping (Bool) -> Void) {
-        proxy()?.setPassword(password, jennaEmail: jennaEmail,
-                             resendKey: resendKey, reply: reply) ?? reply(false)
+    func setPassword(_ password: String, reply: @escaping (Bool) -> Void) {
+        proxy()?.setPassword(password, reply: reply) ?? reply(false)
     }
 
     func reportTamperAttempt(what: String) {

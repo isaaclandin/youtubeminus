@@ -1,5 +1,5 @@
 // YouTubeMinus — service worker (background.js)
-// Handles: email dispatch, browser notifications, and a 30-second alarm
+// Handles: Telegram notifications, browser notifications, and a 30-second alarm
 // that polls Supabase for new approvals so the popup stays current and
 // Isaac gets notified even when he's not on a YouTube tab.
 
@@ -7,7 +7,7 @@ importScripts(
   'lib/config.js',
   'lib/supabase.js',
   'lib/youtube.js',
-  'lib/resend.js'
+  'lib/telegram.js'
 );
 
 // ── Alarm: poll every 30 seconds ─────────────────────────────────────────────
@@ -31,7 +31,7 @@ async function pollForNewApprovals() {
     for (const approval of approvals) {
       if (notifiedIds.includes(approval.id)) continue;
 
-      // New approval — show notification
+      // New approval — show browser notification
       showNotification(
         'Request approved ✓',
         `You can watch: ${approval.video_title || 'the video'}`,
@@ -52,56 +52,51 @@ async function pollForNewApprovals() {
 }
 
 // ── Message handler ───────────────────────────────────────────────────────────
-// Content scripts send messages here for anything that requires API keys
-// or chrome.notifications (not available in content script context).
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   handleMessage(msg).then(sendResponse).catch(e => {
     console.error('[YTM background] message error:', e);
     sendResponse({ ok: false });
   });
-  return true; // keep message channel open for async response
+  return true;
 });
 
 async function handleMessage(msg) {
   switch (msg.type) {
 
-    // ── Email: new request to Jenna ─────────────────────────────────────────
-    case 'SEND_REQUEST_EMAIL':
-      await RESEND.notifyJennaRequest({
+    // ── Telegram: new request to partner(s) ─────────────────────────────────
+    case 'SEND_REQUEST_EMAIL': {
+      const chatIds = msg.partnerChatIds?.length ? msg.partnerChatIds : [YTM_CONFIG.isaacChatId];
+      await Promise.all(chatIds.map(chatId => TELEGRAM.notifyJennaRequest({
+        chatId,
         requestId:      msg.requestId,
         videoTitle:     msg.videoTitle,
         videoThumbnail: msg.videoThumbnail,
         reason:         msg.reason,
-      });
+      })));
       return { ok: true };
+    }
 
-    // ── Email: approval notification to Isaac ────────────────────────────────
+    // ── Telegram: approval notification to Isaac ─────────────────────────────
     case 'SEND_APPROVAL_EMAIL':
-      await RESEND.notifyIsaacApproved({
-        videoTitle:     msg.videoTitle,
-        videoThumbnail: msg.videoThumbnail,
-        durationLabel:  YOUTUBE.durationLabel(msg.durationType),
-        expiresAt:      msg.expiresAt,
-        videoId:        msg.videoId,
+      await TELEGRAM.notifyIsaacApproved({
+        videoTitle:    msg.videoTitle,
+        durationLabel: YOUTUBE.durationLabel(msg.durationType),
+        expiresAt:     msg.expiresAt,
       });
       return { ok: true };
 
-    // ── Email: denial notification to Isaac ──────────────────────────────────
+    // ── Telegram: denial notification to Isaac ───────────────────────────────
     case 'SEND_DENIAL_EMAIL':
-      await RESEND.notifyIsaacDenied({
-        videoTitle:     msg.videoTitle,
-        videoThumbnail: msg.videoThumbnail,
-        videoId:        msg.videoId,
+      await TELEGRAM.notifyIsaacDenied({
+        videoTitle: msg.videoTitle,
       });
       return { ok: true };
 
-    // ── Email: 15-minute expiry warning to Isaac ─────────────────────────────
+    // ── Telegram: 15-minute expiry warning to Isaac ──────────────────────────
     case 'SEND_EXPIRY_WARNING':
-      await RESEND.notifyIsaacExpiryWarning({
-        videoTitle:     msg.videoTitle,
-        videoThumbnail: msg.videoThumbnail,
-        videoId:        msg.videoId,
+      await TELEGRAM.notifyIsaacExpiryWarning({
+        videoTitle: msg.videoTitle,
       });
       return { ok: true };
 
@@ -131,7 +126,6 @@ function showNotification(title, message, videoId) {
     priority: 2,
   });
 
-  // Auto-clear after 8 seconds
   setTimeout(() => chrome.notifications.clear(id), 8_000);
 }
 

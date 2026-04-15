@@ -18,8 +18,7 @@ protocol YouTubeMinusXPCProtocol {
     func verifyPassword(_ password: String, reply: @escaping (Bool) -> Void)
 
     /// Called once during first-run setup to persist the password hash.
-    func setPassword(_ password: String, jennaEmail: String,
-                     resendKey: String, reply: @escaping (Bool) -> Void)
+    func setPassword(_ password: String, reply: @escaping (Bool) -> Void)
 
     /// Force an immediate tamper-check cycle (used by the app after detecting
     /// something suspicious on the user side).

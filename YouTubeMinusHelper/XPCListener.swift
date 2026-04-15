@@ -51,11 +51,8 @@ final class XPCListener: NSObject, NSXPCListenerDelegate, YouTubeMinusXPCProtoco
         reply(keychain.verifyPassword(password))
     }
 
-    func setPassword(_ password: String, jennaEmail: String,
-                     resendKey: String, reply: @escaping (Bool) -> Void) {
+    func setPassword(_ password: String, reply: @escaping (Bool) -> Void) {
         let ok = keychain.storePassword(password)
-            && keychain.save(value: jennaEmail, key: Constants.Keychain.jennaEmailKey)
-            && keychain.save(value: resendKey,  key: Constants.Keychain.resendKeyKey)
         NSLog("[XPCListener] setPassword: \(ok ? "success" : "failed")")
         reply(ok)
     }

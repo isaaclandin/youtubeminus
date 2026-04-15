@@ -5,10 +5,8 @@ struct SetupView: View {
     let onComplete: () -> Void
 
     @State private var step: Step = .welcome
-    @State private var jennaEmail = ""
     @State private var password = ""
     @State private var confirmPassword = ""
-    @State private var resendKey = ""
     @State private var errorMessage: String?
     @State private var isInstalling = false
 
@@ -68,29 +66,25 @@ struct SetupView: View {
 
     private var credentialsStep: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("Jenna's details", systemImage: "person.badge.key")
+            Label("Set the protection password", systemImage: "person.badge.key")
                 .font(.title2.bold())
 
-            Group {
-                field("Jenna's email (for tamper alerts)", text: $jennaEmail)
+            Text("Isaac will never see this. Store it somewhere only you can access.")
+                .foregroundColor(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
-                field("Resend API key", text: $resendKey)
-                    .font(.system(.body, design: .monospaced))
+            Text("Tamper alerts will be sent to Jenna's Telegram account automatically.")
+                .foregroundColor(.secondary)
+                .font(.caption)
+                .fixedSize(horizontal: false, vertical: true)
 
-                Divider()
+            Divider()
 
-                Text("Set the protection password")
-                    .font(.headline)
-                Text("Isaac will never see this. Store it somewhere only you can access.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+            SecureField("Password", text: $password)
+                .textFieldStyle(.roundedBorder)
 
-                SecureField("Password", text: $password)
-                    .textFieldStyle(.roundedBorder)
-
-                SecureField("Confirm password", text: $confirmPassword)
-                    .textFieldStyle(.roundedBorder)
-            }
+            SecureField("Confirm password", text: $confirmPassword)
+                .textFieldStyle(.roundedBorder)
 
             if let err = errorMessage {
                 Text(err).foregroundColor(.red).font(.caption)
@@ -103,7 +97,7 @@ struct SetupView: View {
                 Spacer()
                 Button("Continue →") { validateAndAdvance() }
                     .buttonStyle(.borderedProminent)
-                    .disabled(jennaEmail.isEmpty || password.isEmpty || resendKey.isEmpty)
+                    .disabled(password.isEmpty)
             }
         }
     }
@@ -184,10 +178,6 @@ struct SetupView: View {
             errorMessage = "Password must be at least 8 characters."
             return
         }
-        guard jennaEmail.contains("@") else {
-            errorMessage = "Enter a valid email address."
-            return
-        }
         step = .install
     }
 
@@ -195,11 +185,7 @@ struct SetupView: View {
         isInstalling = true
         errorMessage = nil
 
-        HelperInstaller.shared.install(
-            jennaEmail: jennaEmail,
-            password: password,
-            resendKey: resendKey
-        ) { result in
+        HelperInstaller.shared.install(password: password) { result in
             DispatchQueue.main.async {
                 isInstalling = false
                 switch result {

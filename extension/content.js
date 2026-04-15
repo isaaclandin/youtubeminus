@@ -169,12 +169,20 @@
 
   function enterRequestState(videoId, info) {
     YTMOverlay.showRequest(videoId, info, async (reason) => {
+      // Look up active relationships to get relationship_id and partner chat IDs
+      const relationships = await SUPABASE.getActiveRelationships();
+      const primaryRel = relationships[0];
+      const partnerChatIds = relationships
+        .map(r => r.partner?.telegram_chat_id)
+        .filter(Boolean);
+
       // Create request in Supabase
       const request = await SUPABASE.createRequest({
         videoId,
         videoTitle:     info.title,
         videoThumbnail: info.thumbnail,
         reason,
+        relationshipId: primaryRel?.id,
       });
 
       if (!request) {
@@ -183,13 +191,14 @@
         return;
       }
 
-      // Tell background to send Jenna the email
+      // Tell background to send partner(s) the Telegram notification
       chrome.runtime.sendMessage({
         type:           'SEND_REQUEST_EMAIL',
         requestId:      request.id,
         videoTitle:     info.title,
         videoThumbnail: info.thumbnail,
         reason,
+        partnerChatIds,
       });
 
       enterPendingState(request, info, videoId);
