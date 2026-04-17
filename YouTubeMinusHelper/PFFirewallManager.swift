@@ -71,10 +71,13 @@ final class PFFirewallManager {
         # pf matches the UID of the socket owner for outbound traffic.
         # ChromeProxy runs as root (UID 0) so it can relay Chrome's connections.
         pass out quick proto tcp from any to <youtube> user root
+        pass out quick proto udp from any to <youtube> port 443 user root
 
         # ── Rule 2: Block all other processes from reaching YouTube IPs ────────
         # User-space browsers (Firefox, Safari, Arc, …) cannot connect directly.
+        # Both TCP (HTTPS) and UDP port 443 (QUIC/HTTP3) are blocked.
         block out proto tcp from any to <youtube>
+        block out proto udp from any to <youtube> port 443
 
         # ── Rule 3: DNS lock ──────────────────────────────────────────────────
         # Prevent any process from using a DNS server other than our local resolver.

@@ -3,20 +3,21 @@ import Foundation
 /// Manages system-wide DNS configuration so that all network interfaces
 /// resolve through our local blocking resolver at 127.0.0.1.
 ///
-/// Falls back to 8.8.8.8 so internet keeps working if our daemon restarts.
+/// 127.0.0.1 is set as the ONLY DNS server. Our local resolver forwards
+/// all non-YouTube queries to 8.8.8.8/1.1.1.1 internally, so internet
+/// keeps working. Having upstream servers in the system DNS list allows
+/// browsers to bypass our resolver — so we set only 127.0.0.1.
 final class SystemDNSManager {
 
-    private let primary   = Constants.localDNSHost
-    private let fallback1 = Constants.upstreamDNS1
-    private let fallback2 = Constants.upstreamDNS2
+    private let primary = Constants.localDNSHost
 
     // MARK: - Configure (called once at startup)
 
     func configureDNS() {
         for service in networkServices() {
-            setDNS(on: service, servers: [primary, fallback1, fallback2])
+            setDNS(on: service, servers: [primary])
         }
-        NSLog("[SystemDNS] DNS configured to 127.0.0.1 on \(networkServices().count) interface(s).")
+        NSLog("[SystemDNS] DNS configured to 127.0.0.1 (only) on \(networkServices().count) interface(s).")
     }
 
     // MARK: - Check and restore (called by TamperWatcher)
@@ -27,9 +28,10 @@ final class SystemDNSManager {
         var allOk = true
         for service in networkServices() {
             let current = currentDNS(on: service)
-            if current.first != primary {
+            // Tampered if first server isn't ours, or if fallbacks have been added back
+            if current != [primary] {
                 NSLog("[SystemDNS] Tamper detected on '\(service)' — restoring.")
-                setDNS(on: service, servers: [primary, fallback1, fallback2])
+                setDNS(on: service, servers: [primary])
                 allOk = false
             }
         }
