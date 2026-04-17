@@ -187,15 +187,10 @@
 
       // Split primary vs co-approver chat IDs for escalation logic
       const now = new Date();
-      const explicitPrimary = relationships
+      const primaryChatIds = relationships
         .filter(r => r.role === 'primary')
         .map(r => r.partner?.telegram_chat_id)
         .filter(Boolean);
-
-      // Fall back to all partners if the role column hasn't been populated yet
-      const primaryChatIds = explicitPrimary.length
-        ? explicitPrimary
-        : relationships.map(r => r.partner?.telegram_chat_id).filter(Boolean);
 
       const coApproverChatIds = relationships
         .filter(r => r.role === 'co_approver' && (!r.cooldown_until || new Date(r.cooldown_until) <= now))
