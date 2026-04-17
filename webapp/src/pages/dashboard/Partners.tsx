@@ -450,7 +450,7 @@ function ChangeRequestRow({
 // Invite form (for when no primary exists)
 // ────────────────────────────────────────────────────────────────────────────
 
-function InviteForm({ profileId, onRefresh, isPrimary }: { profileId: string; onRefresh: () => void; isPrimary?: boolean }) {
+function InviteForm({ profileId: _profileId, onRefresh, isPrimary }: { profileId: string; onRefresh: () => void; isPrimary?: boolean }) {
   const [email, setEmail] = useState('')
   const [sending, setSending] = useState(false)
   const [result, setResult] = useState<{ ok: boolean; message: string; link?: string } | null>(null)
@@ -526,7 +526,7 @@ function InviteForm({ profileId, onRefresh, isPrimary }: { profileId: string; on
 // ────────────────────────────────────────────────────────────────────────────
 
 function PartnerSection({
-  partnerRels, primaryPending, currentProfileId, onRefresh,
+  partnerRels, primaryPending, currentProfileId: _currentProfileId, onRefresh,
 }: {
   partnerRels: Relationship[]
   primaryPending: ApproverChangeRequest[]
