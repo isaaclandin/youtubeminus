@@ -392,6 +392,7 @@ export async function createTelegramLinkCode(userId: string): Promise<string | n
 
 export async function sendInvite(
   partnerEmail: string,
+  role: 'primary' | 'co_approver' = 'primary',
 ): Promise<{ ok: true; method: 'telegram' | 'email' | 'link'; inviteUrl?: string } | { ok: false; error: string }> {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return { ok: false, error: 'Not logged in' }
@@ -407,6 +408,7 @@ export async function sendInvite(
       body: JSON.stringify({
         partnerEmail,
         appUrl: window.location.origin,
+        role,
       }),
     },
   )

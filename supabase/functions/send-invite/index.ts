@@ -21,7 +21,7 @@ function json(body: object, status = 200) {
   });
 }
 
-async function sendInviteMessage(chatId: string, text: string, inviteUrl: string) {
+async function sendInviteMessage(chatId: string, text: string, buttonText: string, inviteUrl: string) {
   const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -31,7 +31,7 @@ async function sendInviteMessage(chatId: string, text: string, inviteUrl: string
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [[
-          { text: '✅ Accept Partnership', url: inviteUrl },
+          { text: buttonText, url: inviteUrl },
         ]],
       },
     }),
@@ -50,13 +50,14 @@ Deno.serve(async (req) => {
   );
   if (authErr || !user) return json({ error: 'Unauthorized' }, 401);
 
-  let body: { partnerEmail?: string; appUrl?: string };
+  let body: { partnerEmail?: string; appUrl?: string; role?: string };
   try { body = await req.json(); } catch {
     return json({ error: 'Invalid JSON' }, 400);
   }
 
-  const { partnerEmail, appUrl } = body;
+  const { partnerEmail, appUrl, role = 'primary' } = body;
   if (!partnerEmail || !appUrl) return json({ error: 'Missing partnerEmail or appUrl' }, 400);
+  if (role !== 'primary' && role !== 'co_approver') return json({ error: 'Invalid role' }, 400);
 
   // Can't invite yourself
   if (user.email?.toLowerCase() === partnerEmail.toLowerCase()) {
@@ -78,8 +79,8 @@ Deno.serve(async (req) => {
     .eq('email', partnerEmail.toLowerCase())
     .maybeSingle();
 
-  // Check not already partnered
-  if (partnerProfile) {
+  // Check not already partnered (only for primary — co-approver can also be primary)
+  if (role === 'primary' && partnerProfile) {
     const { data: alreadyPartner } = await supabase
       .from('relationships')
       .select('id')
@@ -96,9 +97,10 @@ Deno.serve(async (req) => {
   const inviteUrl = `${appUrl}/invite/${token}`;
 
   const { error: tokenError } = await supabase.from('invite_tokens').insert({
-    owner_id: user.id,
+    owner_id:   user.id,
     token,
-    used: false,
+    role,
+    used:       false,
     expires_at: expiresAt,
   });
 
@@ -107,18 +109,20 @@ Deno.serve(async (req) => {
     return json({ error: 'Failed to create invite token' }, 500);
   }
 
+  // Build role-appropriate message text and button label
+  const isCoApprover = role === 'co_approver';
+  const telegramText = isCoApprover
+    ? `🤝 *${ownerName} invited you to be their co-approver*\n\nYou'll receive escalated YouTube watch requests when their primary partner hasn't responded after 15 minutes.`
+    : `🤝 *${ownerName} invited you to be their accountability partner*\n\nYou'll review their YouTube watch requests and approve or deny them.`;
+  const buttonText = isCoApprover ? '✅ Accept as Co-approver' : '✅ Accept Partnership';
+
   // If partner has Telegram — send message with inline button
   if (partnerProfile?.telegram_chat_id) {
-    await sendInviteMessage(
-      partnerProfile.telegram_chat_id,
-      `🤝 *${ownerName} invited you to be their accountability partner*\n\nYou'll review their YouTube watch requests and approve or deny them.`,
-      inviteUrl,
-    );
+    await sendInviteMessage(partnerProfile.telegram_chat_id, telegramText, buttonText, inviteUrl);
     return json({ ok: true, method: 'telegram' });
   }
 
-  // Existing user but no Telegram — can't email them via inviteUserByEmail (already registered)
-  // Return the link so the owner can send it manually
+  // Existing user but no Telegram — return the link so the owner can send it manually
   if (partnerProfile) {
     return json({ ok: true, method: 'link', inviteUrl });
   }
