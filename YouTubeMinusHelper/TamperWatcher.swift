@@ -75,8 +75,8 @@ final class TamperWatcher {
 
         if !tampers.isEmpty {
             let what = tampers.joined(separator: "; ")
-            NSLog("[TamperWatcher] Tamper detected: \(what)")
-            sendAlert(what: what)
+            NSLog("[TamperWatcher] Tamper detected (alerts muted): \(what)")
+            // sendAlert(what: what)  // temporarily muted during testing
         }
     }
 

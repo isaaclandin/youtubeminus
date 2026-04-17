@@ -8,8 +8,11 @@ type TimeFilter = 'today' | 'week' | 'month' | 'all'
 type StatusFilter = 'all' | 'approved' | 'denied' | 'pending'
 
 export function Activity() {
-  const { ownerRelationships } = useOutletContext<DashboardOutletContext>()
-  const ownerRelIds = ownerRelationships.map(r => r.id)
+  const { ownerRelationships, partnerRelationships } = useOutletContext<DashboardOutletContext>()
+  const allRelIds = [
+    ...ownerRelationships.map(r => r.id),
+    ...partnerRelationships.map(r => r.id),
+  ]
 
   const [all, setAll] = useState<Request[]>([])
   const [loading, setLoading] = useState(false)
@@ -18,12 +21,12 @@ export function Activity() {
   const [search, setSearch] = useState('')
 
   const fetch = useCallback(async () => {
-    if (!ownerRelIds.length) { setAll([]); return }
+    if (!allRelIds.length) { setAll([]); return }
     setLoading(true)
-    const data = await getAllRequestsForOwner(ownerRelIds)
+    const data = await getAllRequestsForOwner(allRelIds)
     setAll(data)
     setLoading(false)
-  }, [ownerRelIds.join(',')])
+  }, [allRelIds.join(',')])
 
   useEffect(() => { fetch() }, [fetch])
 

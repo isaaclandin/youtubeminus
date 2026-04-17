@@ -9,8 +9,7 @@
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const BOT_TOKEN  = Deno.env.get('TELEGRAM_BOT_TOKEN')!;
-const ISAAC_CHAT = Deno.env.get('ISAAC_CHAT_ID')!;
+const BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')!;
 
 // Service role client — bypasses RLS for profile updates and code lookups
 const supabase = createClient(
@@ -133,7 +132,7 @@ async function handleCallbackQuery(cb: Record<string, unknown>) {
       .eq('id', reqId)
       .single();
     const rel = (data as any)?.relationships;
-    return rel?.owner?.telegram_chat_id ?? ISAAC_CHAT ?? null;
+    return rel?.owner?.telegram_chat_id ?? null;
   }
 
   if (action === 'approve' && requestId && durationType) {

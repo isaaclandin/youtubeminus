@@ -4,9 +4,11 @@ import type { DashboardOutletContext } from './Layout'
 import type { Request } from '../../types'
 
 export function Home() {
-  const { ownerRelationships, pendingCount } = useOutletContext<DashboardOutletContext>()
+  const { ownerRelationships, partnerRelationships, pendingCount } = useOutletContext<DashboardOutletContext>()
   const ownerRelIds = ownerRelationships.map(r => r.id)
-  const { pending, active, history } = useOwnerRequests(ownerRelIds)
+  const partnerRelIds = partnerRelationships.map(r => r.id)
+  const allRelIds = [...ownerRelIds, ...partnerRelIds]
+  const { pending, active, history } = useOwnerRequests(allRelIds)
 
   const recentAll = [...pending, ...active, ...history]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -31,8 +33,8 @@ export function Home() {
         <StatCard label="Denied (7d)" value={denied} color="red" />
       </div>
 
-      {/* No partner yet */}
-      {ownerRelationships.length === 0 && (
+      {/* No relationships at all */}
+      {ownerRelationships.length === 0 && partnerRelationships.length === 0 && (
         <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 text-center flex flex-col gap-3">
           <p className="text-white font-semibold">No accountability partner yet</p>
           <p className="text-neutral-400 text-sm">Add a partner so they can approve your video requests.</p>
